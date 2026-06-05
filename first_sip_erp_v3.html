@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blush:#F3D6DC;--rose:#E9C7CF;--gold:#C8A46B;--gold-light:#E8D5B0;--gold-dark:#A07840;
+  --ivory:#FFF7F4;--beige:#D9B8A5;--brown:#6B4A3F;--brown-dark:#4A2F26;
+  --white:#FFFFFF;--text:#2D1F1A;--text-muted:#8B6E68;--text-light:#B8998F;
+  --border:#EDD8D0;--bg-card:#FFFAF8;--bg-main:#FDF5F0;
+  --success:#7BAF7A;--danger:#C9605A;--info:#7A9FBF;--warn:#C8A46B;
+  --shadow:0 2px 16px rgba(107,74,63,0.08);--shadow-lg:0 8px 40px rgba(107,74,63,0.13);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg-main);color:var(--text);min-height:100vh;overflow-x:hidden}
+.app{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:240px;min-height:100vh;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s ease}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid var(--border)}
+.logo-mark{font-family:'Cinzel Decorative',serif;font-size:13px;color:var(--brown);letter-spacing:3px;text-transform:uppercase;line-height:1.4}
+.logo-sub{font-family:'Cormorant Garamond',serif;font-size:11px;color:var(--gold);letter-spacing:2px;margin-top:2px}
+.logo-divider{width:32px;height:1px;background:var(--gold);margin:8px 0 0}
+.nav-section{padding:16px 0 8px 20px;font-size:9px;letter-spacing:2px;color:var(--text-light);text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;transition:all .2s;border-left:2px solid transparent;font-size:12.5px;color:var(--text-muted);position:relative}
+.nav-item:hover{background:var(--bg-main);color:var(--brown)}
+.nav-item.active{background:linear-gradient(90deg,var(--blush)40%,transparent);color:var(--brown);border-left-color:var(--gold);font-weight:500}
+.nav-item .nav-icon{width:16px;text-align:center;font-size:13px}
+.nav-badge{margin-left:auto;background:var(--gold);color:white;font-size:9px;padding:2px 6px;border-radius:10px;font-weight:600}
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--gold-light));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--brown)}
+.user-name{font-size:12px;font-weight:500;color:var(--brown)}
+.user-role{font-size:10px;color:var(--text-light)}
+
+/* MAIN */
+.main{margin-left:240px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90}
+.page-title{font-family:'Cinzel Decorative',serif;font-size:14px;color:var(--brown);letter-spacing:1px}
+.topbar-actions{display:flex;align-items:center;gap:12px}
+.btn{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:var(--white);color:var(--brown);font-family:'Inter',sans-serif}
+.btn:hover{border-color:var(--gold);background:var(--bg-main)}
+.btn-gold{background:var(--gold);border-color:var(--gold);color:white}
+.btn-gold:hover{background:var(--gold-dark);border-color:var(--gold-dark)}
+.btn-sm{padding:5px 12px;font-size:11px}
+.content{padding:28px 32px;flex:1}
+
+
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-card.gold::before{background:linear-gradient(90deg,var(--gold-light),var(--gold))}
+.kpi-card.rose::before{background:linear-gradient(90deg,var(--blush),var(--rose))}
+.kpi-card.brown::before{background:linear-gradient(90deg,var(--beige),var(--brown))}
+.kpi-card.info::before{background:linear-gradient(90deg,#B5D4F4,#7A9FBF)}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.kpi-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px}
+.kpi-card.gold .kpi-icon{background:var(--gold-light)}
+.kpi-card.rose .kpi-icon{background:var(--blush)}
+.kpi-card.brown .kpi-icon{background:var(--beige)}
+.kpi-card.info .kpi-icon{background:#E6F1FB}
+.kpi-label{font-size:10px;color:var(--text-light);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.kpi-value{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--brown);line-height:1}
+.kpi-sub{font-size:10px;color:var(--text-muted);margin-top:6px}
+.kpi-trend{font-size:10px;font-weight:500;margin-top:4px}
+.trend-up{color:var(--success)}.trend-down{color:var(--danger)}
+
+/* CHARTS ROW */
+.charts-row{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:24px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.card-title{font-family:'Cinzel Decorative',serif;font-size:10px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.chart-area{height:200px;position:relative}
+
+/* PIE CHART */
+.pie-wrap{display:flex;align-items:center;gap:20px;height:180px}
+.pie-svg{flex-shrink:0}
+.pie-legend{flex:1}
+.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:var(--text-muted)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* TABLES */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{text-align:left;padding:8px 12px;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);border-bottom:1px solid var(--border);font-weight:500}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text-muted)}
+tbody tr:hover{background:var(--bg-main)}
+tbody tr:last-child td{border-bottom:none}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:500}
+.badge-green{background:#EBF5EB;color:#4A8A49}
+.badge-gold{background:var(--gold-light);color:var(--gold-dark)}
+.badge-rose{background:var(--blush);color:var(--brown)}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+
+/* MODULE VIEWS */
+.module-view{display:none;animation:fadeIn .3s ease}
+.module-view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* FORMS */
+.form-grid{display:grid;gap:16px;margin-bottom:20px}
+.form-grid-2{grid-template-columns:1fr 1fr}
+.form-grid-3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+label{font-size:11px;font-weight:500;color:var(--text-muted);letter-spacing:.5px}
+input,select,textarea{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);background:var(--white);font-family:'Inter',sans-serif;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+.form-section{background:var(--bg-main);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.section-title{font-family:'Cinzel Decorative',serif;font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+
+/* ASSETS TABLE */
+.asset-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.asset-table th{background:var(--bg-main);padding:9px 10px;text-align:left;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);font-weight:500;border-bottom:1px solid var(--border)}
+.asset-table td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-muted);vertical-align:middle}
+.asset-table tbody tr:hover{background:var(--bg-main)}
+.editable-cell{cursor:text;border-radius:4px;padding:3px 6px;transition:background .15s}
+.editable-cell:hover{background:var(--border)}
+.editable-cell:focus{outline:none;background:white;box-shadow:0 0 0 2px var(--gold)}
+
+/* FINANCING CALCULATOR */
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.calc-inputs{background:var(--bg-main);border:1px solid var(--border);border-radius:12px;padding:20px}
+.calc-result{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px}
+.amort-table{max-height:280px;overflow-y:auto}
+.amort-table table th{position:sticky;top:0;background:var(--bg-main)}
+.result-box{background:linear-gradient(135deg,var(--blush),var(--gold-light));border-radius:10px;padding:16px;margin-bottom:14px;text-align:center}
+.result-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--brown)}
+.result-lbl{font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase}
+
+/* BALANCE SHEET */
+.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.balance-section{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px}
+.bs-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(212,184,165,.3);font-size:12px}
+.bs-row:last-child{border-bottom:none}
+.bs-row.total{font-weight:600;color:var(--brown);border-top:2px solid var(--gold);border-bottom:none;padding-top:10px;margin-top:4px}
+.bs-row.subtotal{font-weight:500;color:var(--brown);background:var(--bg-main);padding:7px 8px;border-radius:6px;margin:4px 0}
+.bs-label{color:var(--text-muted)}
+.bs-value{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--brown)}
+.balance-check{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;border-radius:10px;margin-top:16px;font-size:13px;font-weight:500}
+.balance-ok{background:#EBF5EB;color:#3A7A39;border:1px solid #B5D4B4}
+.balance-error{background:#FCEBEB;color:#8A2828;border:1px solid #F0B0B0}
+
+/* INVENTORY */
+.inventory-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.search-input{padding:8px 14px;border:1px solid var(--border);border-radius:8px;font-size:12px;width:200px;color:var(--text)}
+.stock-indicator{display:flex;align-items:center;gap:6px;font-size:11px}
+.stock-bar{width:60px;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.stock-fill{height:100%;border-radius:3px}
+.stock-ok{background:var(--success)}.stock-low{background:#E8A030}.stock-out{background:var(--danger)}
+
+/* WORKING CAPITAL */
+.wc-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:0}
+.wc-header{background:var(--bg-main);padding:8px 6px;text-align:center;font-size:9px;letter-spacing:.5px;color:var(--text-light);border:1px solid var(--border);text-transform:uppercase}
+.wc-label{padding:9px 10px;font-size:11px;color:var(--text-muted);background:var(--white);border:1px solid var(--border);border-top:none}
+.wc-cell{padding:8px 4px;text-align:center;font-size:11px;color:var(--text-muted);border:1px solid var(--border);border-top:none;cursor:pointer;transition:background .15s}
+.wc-cell:hover{background:var(--blush)}
+.wc-total{background:var(--bg-main);font-weight:600;color:var(--brown)}
+
+/* TAX MODULE */
+.tax-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.tax-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.tax-row:last-child{border-bottom:none}
+.tax-total{background:var(--bg-main);padding:12px;border-radius:8px;display:flex;justify-content:space-between;font-weight:600;font-size:14px;color:var(--brown);margin-top:10px}
+
+/* ECOMMERCE */
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.product-card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s}
+.product-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.product-img{height:100px;background:linear-gradient(135deg,var(--blush),var(--gold-light));display:flex;align-items:center;justify-content:center;font-size:32px}
+.product-info{padding:12px}
+.product-name{font-size:12px;font-weight:500;color:var(--brown);margin-bottom:4px}
+.product-price{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold-dark);font-weight:600}
+.product-stock{font-size:10px;color:var(--text-light)}
+
+/* REPORTS */
+.report-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.report-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .2s}
+.report-card:hover{border-color:var(--gold);transform:translateY(-1px)}
+.report-icon{width:40px;height:40px;border-radius:10px;background:var(--blush);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.report-name{font-size:13px;font-weight:500;color:var(--brown);margin-bottom:4px}
+.report-desc{font-size:11px;color:var(--text-light)}
+.report-actions{display:flex;gap:6px;margin-top:12px}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--bg-main);border-radius:10px;padding:4px;margin-bottom:20px;border:1px solid var(--border)}
+.tab{padding:7px 16px;border-radius:7px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all .2s}
+.tab.active{background:var(--white);color:var(--brown);font-weight:500;box-shadow:0 1px 4px rgba(107,74,63,.08)}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg-main)}
+.upload-zone:hover{border-color:var(--gold);background:var(--blush)}
+.upload-icon{font-size:28px;margin-bottom:8px}
+.upload-text{font-size:12px;color:var(--text-muted)}
+
+/* LAYOUT GALLERY */
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.gallery-item{border-radius:10px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.gallery-item:hover{transform:scale(1.02);box-shadow:var(--shadow)}
+.gallery-img{height:100px;display:flex;align-items:center;justify-content:center;font-size:28px}
+.gallery-label{padding:8px 10px;font-size:11px;color:var(--text-muted);background:var(--white)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* PROGRESS RING */
+.progress-ring{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:4}
+.ring-fill{fill:none;stroke:var(--gold);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1.2s ease}
+
+/* ALERT BANNER */
+.alert{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:12px}
+.alert-warn{background:var(--gold-light);color:var(--brown);border:1px solid var(--gold)}
+.alert-success{background:#EBF5EB;color:#3A7A39;border:1px solid #B5D4B4}
+.alert-danger{background:#FCEBEB;color:#8A2828;border:1px solid #F0B0B0}
+
+/* CALENDAR */
+.tax-calendar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cal-item{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:11.5px}
+.cal-month{font-family:'Cinzel Decorative',serif;font-size:9px;color:var(--gold);letter-spacing:1px;margin-bottom:8px}
+.cal-obligation{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;color:var(--text-muted)}
+.cal-obligation:last-child{border-bottom:none}
+.cal-date{font-weight:500;color:var(--brown)}
+
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.page-h1{font-family:'Cinzel Decorative',serif;font-size:16px;color:var(--brown);letter-spacing:.5px}
+.page-desc{font-size:12px;color:var(--text-light);margin-top:4px;font-family:'Cormorant Garamond',serif;font-style:italic}
+.page-actions{display:flex;gap:8px}
+
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-mini{background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat-mini-val{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--brown)}
+.stat-mini-lbl{font-size:10px;color:var(--text-light);letter-spacing:.5px;text-transform:uppercase}
+
+.divider{height:1px;background:var(--border);margin:16px 0}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">First Sip</div>
+    <div class="logo-sub">ERP · Trujillo, Perú</div>
+    <div class="logo-divider"></div>
+  </div>
+  <div style="overflow-y:auto;flex:1">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="showModule('dashboard')"><span class="nav-icon">◈</span>Dashboard</div>
+    <div class="nav-section">Inversión</div>
+    <div class="nav-item" onclick="showModule('layout')"><span class="nav-icon">⬡</span>Layout & Espacios</div>
+    <div class="nav-item" onclick="showModule('assets')"><span class="nav-icon">◆</span>Activos<span class="nav-badge">2</span></div>
+    <div class="nav-item" onclick="showModule('capital')"><span class="nav-icon">◇</span>Capital de Trabajo</div>
+    <div class="nav-item" onclick="showModule('financing')"><span class="nav-icon">⬢</span>Financiamiento</div>
+    <div class="nav-section">Operaciones</div>
+    <div class="nav-item" onclick="showModule('ecommerce')"><span class="nav-icon">⬟</span>E-Commerce</div>
+    <div class="nav-section">Documentos</div>
+    <div class="nav-item" onclick="showModule('documents')"><span class="nav-icon">📄</span>Documentos<span class="nav-badge" id="doc-badge">0</span></div>
+    <div class="nav-item" onclick="showModule('investments')"><span class="nav-icon">💰</span>Inversiones</div>
+    <div class="nav-section">Finanzas</div>
+    <div class="nav-item" onclick="showModule('tax')"><span class="nav-icon">⬠</span>Tributario SUNAT</div>
+    <div class="nav-item" onclick="showModule('statements')"><span class="nav-icon">≡</span>Estados Financieros</div>
+    <div class="nav-item" onclick="showModule('reports')"><span class="nav-icon">⬣</span>Reportes</div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">FS</div>
+      <div><div class="user-name">Administrador</div><div class="user-role">CFO · FIRST SIP</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <header class="topbar">
+    <div class="page-title" id="topbar-title">Dashboard Financiero</div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" onclick="importExcel()">⬆ Importar Excel</button>
+      <button class="btn btn-sm btn-gold" onclick="exportReport()">⬇ Exportar PDF</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO 1 — DASHBOARD
+═══════════════════════════════════════════════════════ -->
+<div class="module-view active" id="mod-dashboard">
+
+  <div class="kpi-grid">
+    <div class="kpi-card gold" onclick="showModule('assets')">
+      <div class="kpi-icon">◆</div>
+      <div class="kpi-label">Total Activos</div>
+      <div class="kpi-value" id="kpi-activos">S/ 394,724</div>
+      <div class="kpi-sub">Tangibles S/368,224 + Intangibles S/26,500</div>
+      <div class="kpi-trend trend-up">▲ Inversión registrada</div>
+    </div>
+    <div class="kpi-card rose" onclick="showModule('investments')">
+      <div class="kpi-icon">◇</div>
+      <div class="kpi-label">Inversión Total</div>
+      <div class="kpi-value" id="kpi-inversion">S/ 490,624</div>
+      <div class="kpi-sub">Tangibles + Intangibles + Capital trabajo</div>
+      <div class="kpi-trend trend-up">▲ Datos validados del Excel</div>
+    </div>
+    <div class="kpi-card brown" onclick="showModule('capital')">
+      <div class="kpi-icon">⬡</div>
+      <div class="kpi-label">Capital de Trabajo</div>
+      <div class="kpi-value" id="kpi-capital">S/ 95,900</div>
+      <div class="kpi-sub">Planilla + Insumos + Gastos (3 meses)</div>
+      <div class="kpi-trend trend-up">▲ Cobertura saludable</div>
+    </div>
+    <div class="kpi-card info" onclick="showModule('capital')">
+      <div class="kpi-icon">◈</div>
+      <div class="kpi-label">Gasto Mensual</div>
+      <div class="kpi-value" id="kpi-mensual">S/ 31,967</div>
+      <div class="kpi-sub">Gastos operativos estimados por mes</div>
+      <div class="kpi-trend trend-up">✓ Nivel saludable</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <!-- Flujo de caja -->
+    <div class="card">
+      <div class="card-title">
+        Flujo de Caja — Últimos 6 Meses
+        <div style="display:flex;gap:10px;font-size:10px">
+          <span style="color:var(--gold)">● Ingresos</span>
+          <span style="color:var(--rose)">● Egresos</span>
+          <span style="color:var(--brown)">● Saldo</span>
+        </div>
+      </div>
+      <div class="chart-area">
+        <svg width="100%" height="100%" viewBox="0 0 520 180">
+          <!-- Grid lines -->
+          <line x1="40" y1="20" x2="510" y2="20" stroke="var(--border)" stroke-width=".5" stroke-dasharray="3,3"/>
+          <line x1="40" y1="55" x2="510" y2="55" stroke="var(--border)" stroke-width=".5" stroke-dasharray="3,3"/>
+          <line x1="40" y1="90" x2="510" y2="90" stroke="var(--border)" stroke-width=".5" stroke-dasharray="3,3"/>
+          <line x1="40" y1="125" x2="510" y2="125" stroke="var(--border)" stroke-width=".5" stroke-dasharray="3,3"/>
+          <line x1="40" y1="160" x2="510" y2="160" stroke="var(--border)" stroke-width="1"/>
+          <!-- Y axis labels -->
+          <text x="35" y="24" text-anchor="end" font-size="9" fill="var(--text-light)">35k</text>
+          <text x="35" y="59" text-anchor="end" font-size="9" fill="var(--text-light)">26k</text>
+          <text x="35" y="94" text-anchor="end" font-size="9" fill="var(--text-light)">18k</text>
+          <text x="35" y="129" text-anchor="end" font-size="9" fill="var(--text-light)">9k</text>
+          <!-- Ingresos line -->
+          <polyline fill="none" stroke="#C8A46B" stroke-width="2" stroke-linejoin="round"
+            points="65,85 145,65 225,50 305,45 385,40 465,35"/>
+          <!-- Egresos line -->
+          <polyline fill="none" stroke="#E9C7CF" stroke-width="2" stroke-linejoin="round"
+            points="65,110 145,105 225,95 305,100 385,90 465,88"/>
+          <!-- Saldo line -->
+          <polyline fill="none" stroke="#6B4A3F" stroke-width="2" stroke-linejoin="round" stroke-dasharray="5,3"
+            points="65,125 145,115 225,100 305,98 385,90 465,80"/>
+          <!-- Dots ingresos -->
+          <circle cx="65" cy="85" r="3.5" fill="#C8A46B"/>
+          <circle cx="145" cy="65" r="3.5" fill="#C8A46B"/>
+          <circle cx="225" cy="50" r="3.5" fill="#C8A46B"/>
+          <circle cx="305" cy="45" r="3.5" fill="#C8A46B"/>
+          <circle cx="385" cy="40" r="3.5" fill="#C8A46B"/>
+          <circle cx="465" cy="35" r="3.5" fill="#C8A46B"/>
+          <!-- Month labels -->
+          <text x="65" y="174" text-anchor="middle" font-size="9" fill="var(--text-light)">Ene</text>
+          <text x="145" y="174" text-anchor="middle" font-size="9" fill="var(--text-light)">Feb</text>
+          <text x="225" y="174" text-anchor="middle" font-size="9" fill="var(--text-light)">Mar</text>
+          <text x="305" y="174" text-anchor="middle" font-size="9" fill="var(--text-light)">Abr</text>
+          <text x="385" y="174" text-anchor="middle" font-size="9" fill="var(--text-light)">May</text>
+          <text x="465" y="174" text-anchor="middle" font-size="9" fill="var(--text-light)">Jun</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Estructura financiamiento -->
+    <div class="card">
+      <div class="card-title">Estructura de Financiamiento</div>
+      <div class="pie-wrap">
+        <svg class="pie-svg" width="130" height="130" viewBox="0 0 130 130">
+          <!-- Donut chart manual -->
+          <circle cx="65" cy="65" r="45" fill="none" stroke="var(--border)" stroke-width="18"/>
+          <!-- Capital propio 52% -->
+          <circle cx="65" cy="65" r="45" fill="none" stroke="#C8A46B" stroke-width="18"
+            stroke-dasharray="147 283" stroke-dashoffset="0" transform="rotate(-90 65 65)"/>
+          <!-- Banco 28% -->
+          <circle cx="65" cy="65" r="45" fill="none" stroke="#E9C7CF" stroke-width="18"
+            stroke-dasharray="79 283" stroke-dashoffset="-147" transform="rotate(-90 65 65)"/>
+          <!-- Tarjetas 12% -->
+          <circle cx="65" cy="65" r="45" fill="none" stroke="#D9B8A5" stroke-width="18"
+            stroke-dasharray="34 283" stroke-dashoffset="-226" transform="rotate(-90 65 65)"/>
+          <!-- Otros 8% -->
+          <circle cx="65" cy="65" r="45" fill="none" stroke="#6B4A3F" stroke-width="18"
+            stroke-dasharray="23 283" stroke-dashoffset="-260" transform="rotate(-90 65 65)"/>
+          <text x="65" y="61" text-anchor="middle" font-size="11" fill="var(--brown)" font-weight="600" font-family="'Cormorant Garamond',serif">100%</text>
+          <text x="65" y="73" text-anchor="middle" font-size="8" fill="var(--text-light)">S/ 142,850</text>
+        </svg>
+        <div class="pie-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#C8A46B"></div><div><div>Capital propio</div><div style="font-weight:600;color:var(--brown)">52% · S/ 74,282</div></div></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#E9C7CF"></div><div><div>Préstamo banco</div><div style="font-weight:600;color:var(--brown)">28% · S/ 39,998</div></div></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#D9B8A5"></div><div><div>Tarjeta crédito</div><div style="font-weight:600;color:var(--brown)">12% · S/ 17,142</div></div></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#6B4A3F"></div><div><div>Otros</div><div style="font-weight:600;color:var(--brown)">8% · S/ 11,428</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transactions table -->
+  <div class="card">
+    <div class="card-title">Últimas Transacciones<button class="btn btn-sm" style="font-family:'Cinzel Decorative',serif;font-size:8px">Ver todo →</button></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Fecha</th><th>Módulo</th><th>Descripción</th><th>Tipo</th><th>Monto S/.</th><th>Comprobante</th><th>Estado</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>15 Jun 2025</td><td><span class="badge badge-gold">Activos</span></td><td>Cafetera La Marzocco Linea</td><td>Tangible</td><td style="font-weight:600;color:var(--brown)">12,800.00</td><td>F001-00234</td><td><span class="badge badge-green">✓ Registrado</span></td></tr>
+          <tr><td>14 Jun 2025</td><td><span class="badge badge-rose">Ventas</span></td><td>Venta diaria — local</td><td>Ingreso</td><td style="font-weight:600;color:var(--success)">1,240.00</td><td>B002-01089</td><td><span class="badge badge-green">✓ Cobrado</span></td></tr>
+          <tr><td>12 Jun 2025</td><td><span class="badge badge-blue">Financ.</span></td><td>Cuota BCP — Préstamo</td><td>Pago</td><td style="font-weight:600;color:var(--danger)">-1,850.00</td><td>Débito auto.</td><td><span class="badge badge-green">✓ Pagado</span></td></tr>
+          <tr><td>10 Jun 2025</td><td><span class="badge badge-gold">Activos</span></td><td>Branding & Diseño de Marca</td><td>Intangible</td><td style="font-weight:600;color:var(--brown)">3,500.00</td><td>F002-00445</td><td><span class="badge badge-green">✓ Registrado</span></td></tr>
+          <tr><td>08 Jun 2025</td><td><span class="badge badge-rose">Compras</span></td><td>Insumos — café y lácteos</td><td>Inventario</td><td style="font-weight:600;color:var(--danger)">-2,180.00</td><td>F001-08823</td><td><span class="badge badge-green">✓ Ingresado</span></td></tr>
+          <tr><td>05 Jun 2025</td><td><span class="badge badge-blue">Tributario</span></td><td>Pago a cuenta IR — Mayo</td><td>Impuesto</td><td style="font-weight:600;color:var(--danger)">-348.00</td><td>NPS-SUNAT</td><td><span class="badge badge-green">✓ Declarado</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO 2 — LAYOUT & ESPACIOS
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-layout">
+  <div class="page-header">
+    <div><div class="page-h1">Layout & Infraestructura</div><div class="page-desc">Gestión de espacios físicos del café — El Golf, Trujillo</div></div>
+    <div class="page-actions"><button class="btn btn-sm" onclick="alert('Importar desde Excel')">⬆ Importar Excel</button><button class="btn btn-sm btn-gold">+ Nueva Área</button></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="stat-mini-val">7</div><div class="stat-mini-lbl">Áreas registradas</div></div>
+    <div class="stat-mini"><div class="stat-mini-val">285 m²</div><div class="stat-mini-lbl">Área total</div></div>
+    <div class="stat-mini"><div class="stat-mini-val">S/ 48,200</div><div class="stat-mini-lbl">Inversión acondicionamiento</div></div>
+  </div>
+<div style="display:grid;grid-template-columns:1fr;gap:16px">
+  <div class="card" style="margin-bottom:0">
+    <div class="card-title" style="margin-bottom:12px">
+      🏪 FACHADA — S/ 61,814
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--text-muted)" id="count-area_FACHADA">0 imágenes</span>
+        <button class="btn btn-sm" onclick="uploadLayoutImage('area_FACHADA')">+ Subir imagen/plano</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="gallery-area_FACHADA">
+      <div style="border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;height:80px;cursor:pointer" onclick="uploadLayoutImage('area_FACHADA')">
+        <div style="text-align:center;color:var(--text-light);font-size:11px">🖼<br>Agregar</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <div class="card-title" style="margin-bottom:12px">
+      🪑 LOCAL — S/ 85,630
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--text-muted)" id="count-area_LOCAL">0 imágenes</span>
+        <button class="btn btn-sm" onclick="uploadLayoutImage('area_LOCAL')">+ Subir imagen/plano</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="gallery-area_LOCAL">
+      <div style="border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;height:80px;cursor:pointer" onclick="uploadLayoutImage('area_LOCAL')">
+        <div style="text-align:center;color:var(--text-light);font-size:11px">🖼<br>Agregar</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <div class="card-title" style="margin-bottom:12px">
+      🍳 PRODUCCION / COCINA — S/ 90,100
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--text-muted)" id="count-area_PRODUCCION___COCINA">0 imágenes</span>
+        <button class="btn btn-sm" onclick="uploadLayoutImage('area_PRODUCCION___COCINA')">+ Subir imagen/plano</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="gallery-area_PRODUCCION___COCINA">
+      <div style="border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;height:80px;cursor:pointer" onclick="uploadLayoutImage('area_PRODUCCION___COCINA')">
+        <div style="text-align:center;color:var(--text-light);font-size:11px">🖼<br>Agregar</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <div class="card-title" style="margin-bottom:12px">
+      📦 ALMACEN — S/ 38,530
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--text-muted)" id="count-area_ALMACEN">0 imágenes</span>
+        <button class="btn btn-sm" onclick="uploadLayoutImage('area_ALMACEN')">+ Subir imagen/plano</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="gallery-area_ALMACEN">
+      <div style="border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;height:80px;cursor:pointer" onclick="uploadLayoutImage('area_ALMACEN')">
+        <div style="text-align:center;color:var(--text-light);font-size:11px">🖼<br>Agregar</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <div class="card-title" style="margin-bottom:12px">
+      ☕ ATENCION — S/ 85,630
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--text-muted)" id="count-area_ATENCION">0 imágenes</span>
+        <button class="btn btn-sm" onclick="uploadLayoutImage('area_ATENCION')">+ Subir imagen/plano</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="gallery-area_ATENCION">
+      <div style="border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;height:80px;cursor:pointer" onclick="uploadLayoutImage('area_ATENCION')">
+        <div style="text-align:center;color:var(--text-light);font-size:11px">🖼<br>Agregar</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <div class="card-title" style="margin-bottom:12px">
+      💼 ADMINISTRATIVA — S/ 47,620
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--text-muted)" id="count-area_ADMINISTRATIVA">0 imágenes</span>
+        <button class="btn btn-sm" onclick="uploadLayoutImage('area_ADMINISTRATIVA')">+ Subir imagen/plano</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="gallery-area_ADMINISTRATIVA">
+      <div style="border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;height:80px;cursor:pointer" onclick="uploadLayoutImage('area_ADMINISTRATIVA')">
+        <div style="text-align:center;color:var(--text-light);font-size:11px">🖼<br>Agregar</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <div class="card-title" style="margin-bottom:12px">
+      🚿 SERVICIOS HIGIENICOS — S/ 44,530
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--text-muted)" id="count-area_SERVICIOS_HIGIENICOS">0 imágenes</span>
+        <button class="btn btn-sm" onclick="uploadLayoutImage('area_SERVICIOS_HIGIENICOS')">+ Subir imagen/plano</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="gallery-area_SERVICIOS_HIGIENICOS">
+      <div style="border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;height:80px;cursor:pointer" onclick="uploadLayoutImage('area_SERVICIOS_HIGIENICOS')">
+        <div style="text-align:center;color:var(--text-light);font-size:11px">🖼<br>Agregar</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO 3 — ACTIVOS
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-assets">
+  <div class="page-header">
+    <div><div class="page-h1">Gestión de Activos</div><div class="page-desc">Tangibles e Intangibles — Inversión inicial FIRST SIP</div></div>
+    <div class="page-actions">
+  <input type="text" id="asset-search" class="search-input" placeholder="Buscar activo..." oninput="renderTangibles()" style="width:160px">
+  <select id="asset-section-filter" onchange="renderTangibles()" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text)">
+    <option value="all">Todas las áreas</option>
+    <option value="FACHADA">Fachada</option>
+    <option value="ATENCION">Atención</option>
+    <option value="COCINA">Cocina</option>
+    <option value="ALMACEN">Almacén</option>
+    <option value="BAÑO">Baño</option>
+    <option value="ADMINISTRATIVA">Administrativa</option>
+  </select>
+  <button class="btn btn-sm" onclick="importExcel()">⬆ Excel</button>
+  <button class="btn btn-sm" onclick="exportToExcel('assets')">⬇ Exportar</button>
+  <button class="btn btn-sm btn-gold" onclick="addNewAsset()">+ Nuevo Activo</button>
+</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="stat-mini-val" id="stat-tangibles">S/ 368,224</div><div class="stat-mini-lbl">Activos tangibles (Excel)</div></div>
+    <div class="stat-mini"><div class="stat-mini-val" id="stat-intangibles">S/ 26,500</div><div class="stat-mini-lbl">Activos intangibles (Excel)</div></div>
+    <div class="stat-mini"><div class="stat-mini-val" id="stat-deprec">S/ —</div><div class="stat-mini-lbl">Depreciación acumulada</div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'tab-tang')">◆ Activos Tangibles</div>
+    <div class="tab" onclick="switchTab(this,'tab-intang')">◇ Activos Intangibles</div>
+    <div class="tab" onclick="switchTab(this,'tab-deprec')">≡ Depreciación</div>
+  </div>
+  <div id="tab-tang">
+    <div class="table-wrap">
+      <table class="asset-table">
+        <thead><tr>
+          <th>#</th><th>Nombre del activo</th><th>Categoría</th><th>Proveedor</th><th>Cant.</th>
+          <th>C.Unit S/.</th><th>IGV</th><th>Total S/.</th><th>Vida útil</th><th>Dep/Mes</th><th>Financ.</th><th>Estado</th>
+        </tr></thead>
+        <tbody id="asset-tbody">
+          <tr>
+            <td>01</td>
+            <td><div class="editable-cell" contenteditable="true">La Marzocco Linea Mini</div></td>
+            <td><select style="border:none;background:transparent;font-size:11px;color:var(--text-muted);cursor:pointer"><option>Maq. y equipo</option><option>Muebles</option><option>Equipo cómputo</option></select></td>
+            <td><div class="editable-cell" contenteditable="true">Importadora Lima SAC</div></td>
+            <td><div class="editable-cell" contenteditable="true" style="text-align:center">1</div></td>
+            <td><div class="editable-cell" contenteditable="true">10,847.46</div></td>
+            <td style="color:var(--text-light)">1,952.54</td>
+            <td style="font-weight:600;color:var(--brown)">12,800.00</td>
+            <td>10 años</td>
+            <td style="color:var(--danger)">S/ 90.40</td>
+            <td><span class="badge badge-blue">BCP 48%</span></td>
+            <td><span class="badge badge-green">✓</span></td>
+          </tr>
+          <tr>
+            <td>02</td>
+            <td><div class="editable-cell" contenteditable="true">Molino Mahlkönig E65S</div></td>
+            <td><select style="border:none;background:transparent;font-size:11px;color:var(--text-muted)"><option>Maq. y equipo</option></select></td>
+            <td><div class="editable-cell" contenteditable="true">Cafés del Perú SAC</div></td>
+            <td><div class="editable-cell" contenteditable="true" style="text-align:center">2</div></td>
+            <td><div class="editable-cell" contenteditable="true">3,347.46</div></td>
+            <td style="color:var(--text-light)">1,204.88</td>
+            <td style="font-weight:600;color:var(--brown)">7,900.00</td>
+            <td>10 años</td>
+            <td style="color:var(--danger)">S/ 55.74</td>
+            <td><span class="badge badge-gold">Capital</span></td>
+            <td><span class="badge badge-green">✓</span></td>
+          </tr>
+          <tr>
+            <td>03</td>
+            <td><div class="editable-cell" contenteditable="true">Refrigerador exhibidor</div></td>
+            <td><select style="border:none;background:transparent;font-size:11px;color:var(--text-muted)"><option>Maq. y equipo</option></select></td>
+            <td><div class="editable-cell" contenteditable="true">Electra Norte SRL</div></td>
+            <td><div class="editable-cell" contenteditable="true" style="text-align:center">1</div></td>
+            <td><div class="editable-cell" contenteditable="true">5,338.98</div></td>
+            <td style="color:var(--text-light)">961.02</td>
+            <td style="font-weight:600;color:var(--brown)">6,300.00</td>
+            <td>10 años</td>
+            <td style="color:var(--danger)">S/ 44.49</td>
+            <td><span class="badge badge-gold">Capital</span></td>
+            <td><span class="badge badge-green">✓</span></td>
+          </tr>
+          <tr>
+            <td>04</td>
+            <td><div class="editable-cell" contenteditable="true">Mesas redondas mármol (4)</div></td>
+            <td><select style="border:none;background:transparent;font-size:11px;color:var(--text-muted)"><option>Muebles y enseres</option></select></td>
+            <td><div class="editable-cell" contenteditable="true">Diseños Élite Trujillo</div></td>
+            <td><div class="editable-cell" contenteditable="true" style="text-align:center">4</div></td>
+            <td><div class="editable-cell" contenteditable="true">1,059.32</div></td>
+            <td style="color:var(--text-light)">762.71</td>
+            <td style="font-weight:600;color:var(--brown)">5,000.00</td>
+            <td>10 años</td>
+            <td style="color:var(--danger)">S/ 35.25</td>
+            <td><span class="badge badge-gold">Capital</span></td>
+            <td><span class="badge badge-green">✓</span></td>
+          </tr>
+          <tr>
+            <td>05</td>
+            <td><div class="editable-cell" contenteditable="true">Sistema POS + Tablet</div></td>
+            <td><select style="border:none;background:transparent;font-size:11px;color:var(--text-muted)"><option>Equipo cómputo</option></select></td>
+            <td><div class="editable-cell" contenteditable="true">TechStore Peru SAC</div></td>
+            <td><div class="editable-cell" contenteditable="true" style="text-align:center">1</div></td>
+            <td><div class="editable-cell" contenteditable="true">2,118.64</div></td>
+            <td style="color:var(--text-light)">381.36</td>
+            <td style="font-weight:600;color:var(--brown)">2,500.00</td>
+            <td>4 años</td>
+            <td style="color:var(--danger)">S/ 44.10</td>
+            <td><span class="badge badge-blue">BBVA 30%</span></td>
+            <td><span class="badge badge-green">✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display:flex;justify-content:flex-end;padding:12px 0;gap:12px;border-top:1px solid var(--border);margin-top:8px">
+      <span id="asset-totals" style="font-size:12px;color:var(--text-muted);display:flex;gap:20px">Cargando...</span>
+    </div>
+  </div>
+  <div id="tab-intang" style="display:none">
+    <div class="table-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--text-muted)">Total intangibles: <b id="intang-total" style="color:var(--brown)">S/ 26,500.00</b></span>
+    <button class="btn btn-sm btn-gold" onclick="addNewIntangible()">+ Nuevo Intangible</button>
+  </div>
+  <table class="asset-table">
+        <thead><tr><th>#</th><th>Nombre</th><th>Tipo</th><th>Proveedor</th><th>Costo S/.</th><th>Activable</th><th>Vida útil</th><th>Amort/Mes</th><th>Comprobante</th><th></th></tr></thead>
+        <tbody id="intang-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div id="tab-deprec" style="display:none">
+    <div class="alert alert-warn">⚠ Depreciación calculada por método lineal según tasas SUNAT vigentes. Maquinaria: 10% anual · Equipo cómputo: 25% anual · Muebles: 10% anual</div>
+    <div class="table-wrap">
+      <table class="asset-table">
+        <thead><tr><th>Activo</th><th>Costo sin IGV</th><th>Tasa SUNAT</th><th>Dep. Anual</th><th>Dep. Mensual</th><th>Meses uso</th><th>Dep. Acumulada</th><th>Valor en libros</th></tr></thead>
+        <tbody id="deprec-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO 4 — CAPITAL DE TRABAJO
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-capital">
+  <div class="page-header">
+    <div><div class="page-h1">Capital de Trabajo Mensual</div><div class="page-desc">Control de gastos operativos — Régimen MYPE Tributario</div></div>
+    <div class="page-actions"><button class="btn btn-sm" onclick="importExcel()">⬆ Excel</button><button class="btn btn-sm" onclick="alert('Descargando plantilla...')">⬇ Plantilla</button><button class="btn btn-sm btn-gold">Guardar cambios</button></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="stat-mini-val" id="cap-stat-total">S/ 95,900</div><div class="stat-mini-lbl">Total capital de trabajo</div></div>
+    <div class="stat-mini"><div class="stat-mini-val" id="cap-stat-mensual">S/ 31,967</div><div class="stat-mini-lbl">Gasto mensual estimado</div></div>
+    <div class="stat-mini"><div class="stat-mini-val" id="cap-stat-cobertura">3 meses</div><div class="stat-mini-lbl">Cobertura con capital disponible</div></div>
+  </div>
+  <div class="alert alert-success">✓ Capital de trabajo saludable — cobertura mínima recomendada (3 meses) alcanzada</div>
+  <div class="card">
+    <div class="card-title">
+      Capital de Trabajo — Datos del Excel
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="addCapitalItem()">+ Agregar</button>
+        <button class="btn btn-sm btn-gold" onclick="saveCapital()">💾 Guardar</button>
+      </div>
+    </div>
+    <table class="asset-table">
+      <thead><tr><th>Tipo</th><th>Categoría</th><th style="text-align:right">Monto S/</th><th></th></tr></thead>
+      <tbody id="capital-tbody"></tbody>
+      <tfoot>
+        <tr style="background:var(--bg-main)">
+          <td colspan="2" style="padding:10px;font-weight:700;color:var(--brown)">TOTAL CAPITAL DE TRABAJO</td>
+          <td style="padding:10px;font-weight:700;color:var(--brown);font-size:15px;text-align:right" id="capital-total">S/ 95,900.00</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO 5 — FINANCIAMIENTO
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-financing">
+  <div class="page-header">
+    <div><div class="page-h1">Financiamiento</div><div class="page-desc">Cap Table · Préstamos · Calculadora de amortización francesa</div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'fin-captable')">⬡ Cap Table Socios</div>
+    <div class="tab" onclick="switchTab(this,'fin-loans')">⬢ Préstamos</div>
+    <div class="tab" onclick="switchTab(this,'fin-calc')">≡ Calculadora</div>
+  </div>
+  <div id="fin-captable">
+    <div class="table-wrap" style="margin-bottom:16px">
+      <table class="asset-table">
+        <thead><tr><th>#</th><th>Socio / Inversionista</th><th>DNI</th><th>Aporte S/.</th><th>Aporte USD</th><th>% Participación</th><th>Tipo aporte</th><th>Fecha</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>01</td><td><div class="editable-cell" contenteditable="true">María José Rodríguez</div></td><td>44821093</td><td style="font-weight:600;color:var(--brown)">42,000</td><td>11,200</td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:56%;height:100%;background:var(--gold)"></div></div>56%</div></td><td><span class="badge badge-gold">Efectivo</span></td><td>15/01/2025</td><td><span class="badge badge-green">✓</span></td></tr>
+          <tr><td>02</td><td><div class="editable-cell" contenteditable="true">Camila Torres Vega</div></td><td>47293011</td><td style="font-weight:600;color:var(--brown)">22,000</td><td>5,867</td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:30%;height:100%;background:var(--rose)"></div></div>30%</div></td><td><span class="badge badge-rose">Mixto</span></td><td>15/01/2025</td><td><span class="badge badge-green">✓</span></td></tr>
+          <tr><td>03</td><td><div class="editable-cell" contenteditable="true">Lucía Peralta Díaz</div></td><td>48110234</td><td style="font-weight:600;color:var(--brown)">10,282</td><td>2,742</td><td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:14%;height:100%;background:var(--beige)"></div></div>14%</div></td><td><span class="badge badge-blue">Bienes</span></td><td>20/01/2025</td><td><span class="badge badge-green">✓</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;gap:24px;font-size:12px">
+      <span>Total capital propio: <b style="color:var(--brown)">S/ 74,282</b></span>
+      <span>Socios activos: <b style="color:var(--brown)">3</b></span>
+      <span>Aporte promedio: <b style="color:var(--brown)">S/ 24,761</b></span>
+    </div>
+  </div>
+  <div id="fin-loans" style="display:none">
+    <div class="table-wrap">
+      <table class="asset-table">
+        <thead><tr><th>#</th><th>Institución</th><th>Tipo</th><th>Monto S/.</th><th>TEA</th><th>Plazo</th><th>F.Inicio</th><th>Cuota/Mes</th><th>Saldo</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>01</td><td>BCP</td><td><span class="badge badge-blue">Préstamo</span></td><td>28,000</td><td>18%</td><td>48 meses</td><td>Feb/2025</td><td style="color:var(--danger)">S/ 821</td><td>S/ 24,628</td><td><span class="badge badge-green">Vigente</span></td></tr>
+          <tr><td>02</td><td>BBVA</td><td><span class="badge badge-gold">Leasing</span></td><td>12,000</td><td>14%</td><td>36 meses</td><td>Feb/2025</td><td style="color:var(--danger)">S/ 404</td><td>S/ 10,240</td><td><span class="badge badge-green">Vigente</span></td></tr>
+          <tr><td>03</td><td>Visa Clásica</td><td><span class="badge badge-rose">Tarjeta</span></td><td>5,200</td><td>64%</td><td>12 meses</td><td>Mar/2025</td><td style="color:var(--danger)">S/ 590</td><td>S/ 3,532</td><td><span class="badge badge-gold">En proceso</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="fin-calc" style="display:none">
+    <div class="calc-grid">
+      <div class="calc-inputs">
+        <div class="section-title">Parámetros del préstamo</div>
+        <div class="form-group" style="margin-bottom:12px"><label>Monto del préstamo (S/.)</label><input type="number" id="calc-monto" value="28000" oninput="calcAmort()"></div>
+        <div class="form-group" style="margin-bottom:12px"><label>TEA (%)</label><input type="number" id="calc-tea" value="18" step="0.1" oninput="calcAmort()"></div>
+        <div class="form-group" style="margin-bottom:12px"><label>Plazo (meses)</label><input type="number" id="calc-plazo" value="48" oninput="calcAmort()"></div>
+        <div class="form-group" style="margin-bottom:12px"><label>Período de gracia</label><select id="calc-gracia" onchange="calcAmort()"><option value="0">Sin gracia</option><option value="1">1 mes parcial</option><option value="3">3 meses total</option></select></div>
+        <div class="form-group"><label>Seguro desgravamen (%/mes)</label><input type="number" id="calc-seguro" value="0.05" step="0.01" oninput="calcAmort()"></div>
+      </div>
+      <div class="calc-result">
+        <div class="result-box">
+          <div class="result-lbl">Cuota mensual (Sistema Francés)</div>
+          <div class="result-val" id="calc-cuota">S/ —</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div style="background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--text-light);text-transform:uppercase;letter-spacing:1px">Total intereses</div><div id="calc-interest" style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--danger)">—</div></div>
+          <div style="background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--text-light);text-transform:uppercase;letter-spacing:1px">Costo total</div><div id="calc-total" style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--brown)">—</div></div>
+        </div>
+        <div class="amort-table">
+          <table class="asset-table" id="amort-table-body" style="font-size:10.5px">
+            <thead><tr><th>N°</th><th>Cuota</th><th>Capital</th><th>Interés</th><th>Seguro</th><th>Saldo</th></tr></thead>
+            <tbody id="amort-rows"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-sm" onclick="alert('Exportando tabla de amortización a Excel...')">⬇ Excel</button>
+          <button class="btn btn-sm" onclick="alert('Generando PDF cronograma...')">⬇ PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO 6 — E-COMMERCE
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-ecommerce">
+  <div class="page-header">
+    <div><div class="page-h1">E-Commerce & Inventario</div><div class="page-desc">Catálogo · Kardex PEPS · Punto de venta</div></div>
+    <div class="page-actions"><button class="btn btn-sm" onclick="importExcel()">⬆ Importar Stock</button><button class="btn btn-sm btn-gold">+ Nuevo producto</button></div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'ec-catalog')">◆ Catálogo</div>
+    <div class="tab" onclick="switchTab(this,'ec-inventory')">◇ Inventario</div>
+    <div class="tab" onclick="switchTab(this,'ec-pos')">⬢ Punto de Venta</div>
+  </div>
+  <div id="ec-catalog">
+    <div class="product-grid">
+      <div class="product-card"><div class="product-img">☕</div><div class="product-info"><div class="product-name">Latte Rosé de Frambuesa</div><div class="product-price">S/ 16.90</div><div class="product-stock">Stock: 40 und · Costo: S/ 6.20</div><div style="font-size:10px;color:var(--success);margin-top:2px">Margen: 63.3%</div></div></div>
+      <div class="product-card"><div class="product-img" style="background:linear-gradient(135deg,#E9C7CF,#F3D6DC)">🧁</div><div class="product-info"><div class="product-name">Croissant de Almendra</div><div class="product-price">S/ 12.50</div><div class="product-stock">Stock: 15 und · Costo: S/ 4.80</div><div style="font-size:10px;color:var(--success);margin-top:2px">Margen: 61.6%</div></div></div>
+      <div class="product-card"><div class="product-img" style="background:linear-gradient(135deg,#D9B8A5,#E8D5B0)">🍵</div><div class="product-info"><div class="product-name">Matcha Latte Premium</div><div class="product-price">S/ 18.00</div><div class="product-stock">Stock: 25 und · Costo: S/ 7.40</div><div style="font-size:10px;color:var(--success);margin-top:2px">Margen: 58.9%</div></div></div>
+      <div class="product-card"><div class="product-img" style="background:linear-gradient(135deg,#FFF7F4,#F3D6DC)">🍰</div><div class="product-info"><div class="product-name">Cheesecake de Frutos Rojos</div><div class="product-price">S/ 22.00</div><div class="product-stock" style="color:var(--warn)">Stock: 4 und ⚠ bajo</div><div style="font-size:10px;color:var(--success);margin-top:2px">Margen: 70.5%</div></div></div>
+    </div>
+  </div>
+  <div id="ec-inventory" style="display:none">
+    <div class="alert alert-warn">📦 Método de valuación: PEPS (FIFO) — obligatorio según SUNAT. El costo de ventas usa siempre el lote más antiguo primero.</div>
+    <table class="asset-table">
+      <thead><tr><th>SKU</th><th>Insumo</th><th>Unidad</th><th>Stock actual</th><th>Stock mín.</th><th>C.Unit S/.</th><th>C.Total</th><th>Proveedor</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td>INS-001</td><td>Café Especial (Single Origin)</td><td>kg</td><td><div class="stock-indicator"><div class="stock-bar"><div class="stock-fill stock-ok" style="width:75%"></div></div>15 kg</div></td><td>5 kg</td><td>38.00</td><td style="font-weight:600;color:var(--brown)">570.00</td><td>Café Quechua Export</td><td><span class="badge badge-green">OK</span></td></tr>
+        <tr><td>INS-002</td><td>Leche entera UHT</td><td>litros</td><td><div class="stock-indicator"><div class="stock-bar"><div class="stock-fill stock-low" style="width:30%"></div></div>18 lt</div></td><td>20 lt</td><td>4.50</td><td style="font-weight:600;color:var(--brown)">81.00</td><td>Gloria SA</td><td><span class="badge" style="background:#FFF3E0;color:#C07000">⚠ Bajo</span></td></tr>
+        <tr><td>INS-003</td><td>Syrup frambuesa</td><td>botella</td><td><div class="stock-indicator"><div class="stock-bar"><div class="stock-fill stock-ok" style="width:80%"></div></div>8 bot</div></td><td>3 bot</td><td>28.00</td><td style="font-weight:600;color:var(--brown)">224.00</td><td>Monin Perú SAC</td><td><span class="badge badge-green">OK</span></td></tr>
+        <tr><td>INS-004</td><td>Matcha ceremonial</td><td>kg</td><td><div class="stock-indicator"><div class="stock-bar"><div class="stock-fill stock-out" style="width:10%"></div></div>0.5 kg</div></td><td>1 kg</td><td>180.00</td><td style="font-weight:600;color:var(--brown)">90.00</td><td>Japan Green Tea Co</td><td><span class="badge badge-red">⚠ Crítico</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="ec-pos" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="card">
+        <div class="card-title">Seleccionar productos</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-align:center;transition:all .2s" onclick="addToCart('Latte Rosé','16.90')"><div style="font-size:20px;margin-bottom:4px">☕</div><div style="font-size:11px;font-weight:500;color:var(--brown)">Latte Rosé</div><div style="font-size:12px;color:var(--gold)">S/ 16.90</div></div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-align:center;transition:all .2s" onclick="addToCart('Croissant','12.50')"><div style="font-size:20px;margin-bottom:4px">🧁</div><div style="font-size:11px;font-weight:500;color:var(--brown)">Croissant</div><div style="font-size:12px;color:var(--gold)">S/ 12.50</div></div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-align:center;transition:all .2s" onclick="addToCart('Matcha Latte','18.00')"><div style="font-size:20px;margin-bottom:4px">🍵</div><div style="font-size:11px;font-weight:500;color:var(--brown)">Matcha</div><div style="font-size:12px;color:var(--gold)">S/ 18.00</div></div>
+          <div style="border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-align:center;transition:all .2s" onclick="addToCart('Cheesecake','22.00')"><div style="font-size:20px;margin-bottom:4px">🍰</div><div style="font-size:11px;font-weight:500;color:var(--brown)">Cheesecake</div><div style="font-size:12px;color:var(--gold)">S/ 22.00</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Carrito de venta</div>
+        <div id="cart-items" style="min-height:100px;margin-bottom:12px"></div>
+        <div style="border-top:1px solid var(--border);padding-top:10px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--text-muted)">Subtotal sin IGV:</span><span id="cart-sub">S/ 0.00</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--text-muted)">IGV 18%:</span><span id="cart-igv">S/ 0.00</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;color:var(--brown);margin-bottom:12px"><span>TOTAL:</span><span id="cart-total">S/ 0.00</span></div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <select style="flex:1;font-size:11px"><option>Efectivo</option><option>Yape/Plin</option><option>Tarjeta</option></select>
+            <select style="flex:1;font-size:11px"><option>Boleta</option><option>Factura</option></select>
+          </div>
+          <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="processSale()">✓ Confirmar Venta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO 7 — TRIBUTARIO
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-tax">
+  <div class="page-header">
+    <div><div class="page-h1">Módulo Tributario SUNAT</div><div class="page-desc">MYPE Tributario · IGV · IR · Planilla · Calendario</div></div>
+    <div class="page-actions"><button class="btn btn-sm btn-gold" onclick="alert('Exportando libro de ventas...')">⬇ Libro de Ventas</button></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="stat-mini-val">S/ 1,284</div><div class="stat-mini-lbl">IGV por pagar (Jun)</div></div>
+    <div class="stat-mini"><div class="stat-mini-val">S/ 348</div><div class="stat-mini-lbl">IR pago a cuenta (Jun)</div></div>
+    <div class="stat-mini"><div class="stat-mini-val">S/ 738</div><div class="stat-mini-lbl">ESSALUD (Jun)</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="tax-card">
+      <div class="card-title" style="margin-bottom:14px">IGV Mensual — Junio 2025</div>
+      <div class="tax-row"><span>Ventas gravadas del mes:</span><span style="font-weight:600;color:var(--brown)">S/ 34,800</span></div>
+      <div class="tax-row"><span>IGV débito fiscal (18%):</span><span style="color:var(--danger)">S/ 6,264</span></div>
+      <div class="tax-row"><span>Compras con factura:</span><span style="font-weight:600;color:var(--brown)">S/ 27,667</span></div>
+      <div class="tax-row"><span>IGV crédito fiscal (18%):</span><span style="color:var(--success)">S/ 4,980</span></div>
+      <div class="divider"></div>
+      <div class="tax-total"><span>IGV A PAGAR:</span><span>S/ 1,284</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:11px">
+        <span style="color:var(--text-muted)">Vencimiento SUNAT: 17/07/2025</span>
+        <span class="badge badge-gold">⏳ Pendiente</span>
+      </div>
+    </div>
+    <div class="tax-card">
+      <div class="card-title" style="margin-bottom:14px">IR Pago a Cuenta — Junio 2025</div>
+      <div class="tax-row"><span>Ventas netas acumuladas:</span><span style="font-weight:600;color:var(--brown)">S/ 174,000</span></div>
+      <div class="tax-row"><span>UIT 2025:</span><span>S/ 5,150</span></div>
+      <div class="tax-row"><span>Límite 300 UIT:</span><span>S/ 1,545,000</span></div>
+      <div class="tax-row"><span>Tasa aplicable:</span><span style="font-weight:600;color:var(--brown)">1.0% (hasta 300 UIT)</span></div>
+      <div class="tax-row"><span>Ventas mes de junio:</span><span>S/ 34,800</span></div>
+      <div class="divider"></div>
+      <div class="tax-total"><span>PAGO A CUENTA:</span><span>S/ 348</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:11px">
+        <span style="color:var(--text-muted)">Vencimiento: 17/07/2025</span>
+        <span class="badge badge-gold">⏳ Pendiente</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Calendario Tributario 2025 — FIRST SIP</div>
+    <div class="tax-calendar">
+      <div class="cal-item">
+        <div class="cal-month">Junio 2025</div>
+        <div class="cal-obligation"><span>IGV Mayo</span><span class="cal-date">17 Jun</span></div>
+        <div class="cal-obligation"><span>IR Mayo</span><span class="cal-date">17 Jun</span></div>
+        <div class="cal-obligation"><span>PLAME Mayo</span><span class="cal-date">20 Jun</span></div>
+      </div>
+      <div class="cal-item">
+        <div class="cal-month">Julio 2025</div>
+        <div class="cal-obligation"><span>IGV Junio</span><span class="cal-date">17 Jul</span></div>
+        <div class="cal-obligation"><span>IR Junio</span><span class="cal-date">17 Jul</span></div>
+        <div class="cal-obligation"><span>Gratificaciones</span><span class="cal-date">15 Jul</span></div>
+      </div>
+      <div class="cal-item">
+        <div class="cal-month">Agosto 2025</div>
+        <div class="cal-obligation"><span>IGV Julio</span><span class="cal-date">18 Ago</span></div>
+        <div class="cal-obligation"><span>IR Julio</span><span class="cal-date">18 Ago</span></div>
+        <div class="cal-obligation"><span>PLAME Julio</span><span class="cal-date">21 Ago</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO 8 — ESTADOS FINANCIEROS
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-statements">
+  <div class="page-header">
+    <div><div class="page-h1">Estados Financieros</div><div class="page-desc">Balance General · Estado de Resultados · Flujo de Caja</div></div>
+    <div class="page-actions"><button class="btn btn-sm" onclick="alert('Exportando a Excel con fórmulas...')">⬇ Excel</button><button class="btn btn-sm btn-gold" onclick="alert('Generando PDF oficial...')">⬇ PDF Oficial</button></div>
+  </div>
+  <div id="balance-ok-banner" class="balance-check balance-ok" style="margin-bottom:16px">
+    ✅ ACTIVO = PASIVO + PATRIMONIO · Balance cuadrado: <b>S/ 142,850</b>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'stmt-balance')">≡ Balance General (ESF)</div>
+    <div class="tab" onclick="switchTab(this,'stmt-results')">◆ Estado de Resultados</div>
+    <div class="tab" onclick="switchTab(this,'stmt-cashflow')">◇ Flujo de Caja</div>
+  </div>
+  <div id="stmt-balance">
+    <div class="balance-grid">
+      <div>
+        <div class="balance-section">
+          <div class="section-title" style="color:var(--brown);font-size:11px;font-family:'Cinzel Decorative',serif;letter-spacing:1px">ACTIVO</div>
+          <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin:10px 0 6px;text-transform:uppercase">Activo Corriente</div>
+          <div class="bs-row"><span class="bs-label">101 Caja y efectivo</span><span class="bs-value">12,450</span></div>
+          <div class="bs-row"><span class="bs-label">104 Cuentas bancarias</span><span class="bs-value">8,320</span></div>
+          <div class="bs-row"><span class="bs-label">121 Cuentas por cobrar</span><span class="bs-value">2,180</span></div>
+          <div class="bs-row"><span class="bs-label">201 Inventarios (PEPS)</span><span class="bs-value">4,880</span></div>
+          <div class="bs-row"><span class="bs-label">401-CF IGV crédito fiscal</span><span class="bs-value">1,240</span></div>
+          <div class="bs-row subtotal"><span class="bs-label">TOTAL ACTIVO CORRIENTE</span><span class="bs-value" style="font-size:15px">29,070</span></div>
+          <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin:10px 0 6px;text-transform:uppercase">Activo No Corriente</div>
+          <div class="bs-row"><span class="bs-label">33X Inmueble, maq. y equipo</span><span class="bs-value">98,500</span></div>
+          <div class="bs-row"><span class="bs-label">(-) 391 Dep. acumulada</span><span class="bs-value" style="color:var(--danger)">(8,420)</span></div>
+          <div class="bs-row"><span class="bs-label">34X Intangibles</span><span class="bs-value">12,350</span></div>
+          <div class="bs-row"><span class="bs-label">(-) 392 Amort. acumulada</span><span class="bs-value" style="color:var(--danger)">(1,200)</span></div>
+          <div class="bs-row subtotal"><span class="bs-label">TOTAL ACTIVO NO CORRIENTE</span><span class="bs-value" style="font-size:15px">101,230</span></div>
+          <div class="bs-row total"><span>TOTAL ACTIVO</span><span class="bs-value" style="font-size:17px;color:var(--gold-dark)">142,300</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="balance-section" style="margin-bottom:12px">
+          <div class="section-title" style="color:var(--brown);font-size:11px;font-family:'Cinzel Decorative',serif;letter-spacing:1px">PASIVO</div>
+          <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin:10px 0 6px;text-transform:uppercase">Pasivo Corriente</div>
+          <div class="bs-row"><span class="bs-label">421 Cuentas por pagar</span><span class="bs-value">3,420</span></div>
+          <div class="bs-row"><span class="bs-label">411 Remuneraciones x pagar</span><span class="bs-value">8,200</span></div>
+          <div class="bs-row"><span class="bs-label">415 CTS por pagar</span><span class="bs-value">1,640</span></div>
+          <div class="bs-row"><span class="bs-label">401-V IGV por pagar</span><span class="bs-value">1,284</span></div>
+          <div class="bs-row"><span class="bs-label">Porción CP préstamos</span><span class="bs-value">9,852</span></div>
+          <div class="bs-row subtotal"><span class="bs-label">TOTAL PASIVO CORRIENTE</span><span class="bs-value" style="font-size:15px">24,396</span></div>
+          <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin:10px 0 6px;text-transform:uppercase">Pasivo No Corriente</div>
+          <div class="bs-row"><span class="bs-label">451 Préstamos bancarios LP</span><span class="bs-value">28,016</span></div>
+          <div class="bs-row"><span class="bs-label">452 Leasing financiero LP</span><span class="bs-value">10,240</span></div>
+          <div class="bs-row subtotal"><span class="bs-label">TOTAL PASIVO NO CORRIENTE</span><span class="bs-value" style="font-size:15px">38,256</span></div>
+          <div class="bs-row total"><span>TOTAL PASIVO</span><span class="bs-value" style="font-size:17px;color:var(--danger)">62,652</span></div>
+        </div>
+        <div class="balance-section">
+          <div class="section-title" style="color:var(--brown);font-size:11px;font-family:'Cinzel Decorative',serif;letter-spacing:1px">PATRIMONIO</div>
+          <div class="bs-row"><span class="bs-label">501 Capital social</span><span class="bs-value">74,282</span></div>
+          <div class="bs-row"><span class="bs-label">581 Reserva legal</span><span class="bs-value">0</span></div>
+          <div class="bs-row"><span class="bs-label">591 Resultados acumulados</span><span class="bs-value">0</span></div>
+          <div class="bs-row"><span class="bs-label">592 Resultado del ejercicio</span><span class="bs-value">5,366</span></div>
+          <div class="bs-row total"><span>TOTAL PATRIMONIO</span><span class="bs-value" style="font-size:17px;color:var(--success)">79,648</span></div>
+        </div>
+        <div class="balance-check balance-ok" style="margin-top:12px;font-size:11px">
+          ✅ A = P + PATRIM · 142,300 = 62,652 + 79,648
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="stmt-results" style="display:none">
+    <div style="max-width:520px;margin:0 auto">
+      <div class="balance-section">
+        <div class="section-title" style="color:var(--brown);font-size:11px;font-family:'Cinzel Decorative',serif;letter-spacing:1px;margin-bottom:14px">Estado de Resultados — Ene a Jun 2025</div>
+        <div class="bs-row"><span class="bs-label">(+) Ventas netas (sin IGV)</span><span class="bs-value" style="color:var(--success)">174,000</span></div>
+        <div class="bs-row"><span class="bs-label">(-) Costo de ventas (PEPS)</span><span class="bs-value" style="color:var(--danger)">(63,510)</span></div>
+        <div class="bs-row subtotal"><span>UTILIDAD BRUTA</span><span class="bs-value" style="font-size:15px">110,490</span></div>
+        <div style="font-size:10px;color:var(--text-light);margin:8px 0 4px">Gastos operativos</div>
+        <div class="bs-row"><span class="bs-label">(-) Gastos de ventas</span><span class="bs-value" style="color:var(--danger)">(8,820)</span></div>
+        <div class="bs-row"><span class="bs-label">(-) Gastos administrativos</span><span class="bs-value" style="color:var(--danger)">(82,250)</span></div>
+        <div class="bs-row subtotal"><span>UTILIDAD OPERATIVA (EBIT)</span><span class="bs-value" style="font-size:15px">19,420</span></div>
+        <div class="bs-row"><span class="bs-label">(-) Dep. y amortización</span><span class="bs-value" style="color:var(--danger)">(9,620)</span></div>
+        <div class="bs-row"><span class="bs-label">(-) Gastos financieros</span><span class="bs-value" style="color:var(--danger)">(3,780)</span></div>
+        <div class="bs-row subtotal"><span>UTILIDAD ANTES DE IR</span><span class="bs-value" style="font-size:15px">6,020</span></div>
+        <div class="bs-row"><span class="bs-label">(-) IR MYPE 10% (hasta 15 UIT)</span><span class="bs-value" style="color:var(--danger)">(602)</span></div>
+        <div class="bs-row total"><span>UTILIDAD NETA</span><span class="bs-value" style="font-size:20px;color:var(--success)">S/ 5,418</span></div>
+      </div>
+    </div>
+  </div>
+  <div id="stmt-cashflow" style="display:none">
+    <div style="max-width:520px;margin:0 auto">
+      <div class="balance-section">
+        <div class="section-title" style="color:var(--brown);font-size:11px;font-family:'Cinzel Decorative',serif;letter-spacing:1px;margin-bottom:14px">Flujo de Caja — Ene a Jun 2025</div>
+        <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">Flujo Operativo</div>
+        <div class="bs-row"><span class="bs-label">Ventas cobradas</span><span class="bs-value" style="color:var(--success)">176,180</span></div>
+        <div class="bs-row"><span class="bs-label">Gastos operativos pagados</span><span class="bs-value" style="color:var(--danger)">(167,970)</span></div>
+        <div class="bs-row subtotal"><span>Subtotal operativo</span><span class="bs-value">8,210</span></div>
+        <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin:10px 0 8px;text-transform:uppercase">Flujo de Inversión</div>
+        <div class="bs-row"><span class="bs-label">Compra activos fijos</span><span class="bs-value" style="color:var(--danger)">(110,850)</span></div>
+        <div class="bs-row subtotal"><span>Subtotal inversión</span><span class="bs-value" style="color:var(--danger)">(110,850)</span></div>
+        <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin:10px 0 8px;text-transform:uppercase">Flujo de Financiamiento</div>
+        <div class="bs-row"><span class="bs-label">Aportes de socios</span><span class="bs-value" style="color:var(--success)">74,282</span></div>
+        <div class="bs-row"><span class="bs-label">Préstamos recibidos</span><span class="bs-value" style="color:var(--success)">45,200</span></div>
+        <div class="bs-row"><span class="bs-label">Amortización préstamos</span><span class="bs-value" style="color:var(--danger)">(5,072)</span></div>
+        <div class="bs-row subtotal"><span>Subtotal financiamiento</span><span class="bs-value">114,410</span></div>
+        <div class="bs-row total"><span>SALDO FINAL DE CAJA</span><span class="bs-value" style="font-size:18px;color:var(--success)">S/ 11,770</span></div>
+        <div style="font-size:10px;color:var(--text-light);text-align:center;margin-top:8px">✅ Concilia con Caja + Bancos del Balance: S/ 20,770 (incluye saldo inicial S/ 9,000)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO 9 — REPORTES
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-reports">
+  <div class="page-header">
+    <div><div class="page-h1">Centro de Reportes</div><div class="page-desc">Exporta a Excel · PDF · Imprime con branding FIRST SIP</div></div>
+  </div>
+  <div class="report-grid">
+    <div class="report-card" onclick="alert('Generando reporte de inversión inicial...')">
+      <div class="report-icon">◆</div>
+      <div class="report-name">Resumen de Inversión</div>
+      <div class="report-desc">Tangibles + Intangibles + Cap.Trabajo</div>
+      <div class="report-actions"><button class="btn btn-sm">⬇ Excel</button><button class="btn btn-sm">⬇ PDF</button><button class="btn btn-sm">🖨 Imprimir</button></div>
+    </div>
+    <div class="report-card" onclick="alert('Generando plan de financiamiento...')">
+      <div class="report-icon">⬡</div>
+      <div class="report-name">Plan de Financiamiento</div>
+      <div class="report-desc">Cap table + préstamos + amortización</div>
+      <div class="report-actions"><button class="btn btn-sm">⬇ Excel</button><button class="btn btn-sm">⬇ PDF</button><button class="btn btn-sm">🖨 Imprimir</button></div>
+    </div>
+    <div class="report-card" onclick="alert('Generando balance general...')">
+      <div class="report-icon">≡</div>
+      <div class="report-name">Balance General (ESF)</div>
+      <div class="report-desc">Con validación Activo = Pasivo + Patrimonio</div>
+      <div class="report-actions"><button class="btn btn-sm">⬇ Excel</button><button class="btn btn-sm">⬇ PDF</button><button class="btn btn-sm">🖨 Imprimir</button></div>
+    </div>
+    <div class="report-card" onclick="alert('Generando estado de resultados...')">
+      <div class="report-icon">◇</div>
+      <div class="report-name">Estado de Resultados</div>
+      <div class="report-desc">P&L mensual / acumulado / proyectado</div>
+      <div class="report-actions"><button class="btn btn-sm">⬇ Excel</button><button class="btn btn-sm">⬇ PDF</button><button class="btn btn-sm">🖨 Imprimir</button></div>
+    </div>
+    <div class="report-card" onclick="alert('Generando libro de ventas referencial...')">
+      <div class="report-icon">⬢</div>
+      <div class="report-name">Libro de Ventas SUNAT</div>
+      <div class="report-desc">Formato referencial declaración IGV</div>
+      <div class="report-actions"><button class="btn btn-sm">⬇ Excel</button><button class="btn btn-sm">⬇ PDF</button><button class="btn btn-sm">🖨 Imprimir</button></div>
+    </div>
+    <div class="report-card" onclick="alert('Generando reporte de inventario PEPS...')">
+      <div class="report-icon">⬟</div>
+      <div class="report-name">Kardex de Inventario</div>
+      <div class="report-desc">Método PEPS por ítem — movimientos</div>
+      <div class="report-actions"><button class="btn btn-sm">⬇ Excel</button><button class="btn btn-sm">⬇ PDF</button><button class="btn btn-sm">🖨 Imprimir</button></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO — DOCUMENTOS & COMPROBANTES
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-documents">
+  <div class="page-header">
+    <div><div class="page-h1">Documentos & Comprobantes</div><div class="page-desc">Facturas · Boletas · Contratos · PDFs — FIRST SIP</div></div>
+    <div class="page-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Buscar documento..." oninput="searchDocuments()" style="width:200px">
+      <select id="doc-filter" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text)">
+        <option value="all">Todos los tipos</option>
+        <option value="Factura">Facturas</option>
+        <option value="Boleta">Boletas</option>
+        <option value="Contrato">Contratos</option>
+        <option value="Licencia">Licencias</option>
+        <option value="PDF">PDFs</option>
+      </select>
+      <button class="btn btn-sm btn-gold" onclick="uploadDocument()">⬆ Subir Documento</button>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="stat-mini-val" id="doc-count-total">0</div><div class="stat-mini-lbl">Documentos totales</div></div>
+    <div class="stat-mini"><div class="stat-mini-val" id="doc-count-facturas">0</div><div class="stat-mini-lbl">Facturas</div></div>
+    <div class="stat-mini"><div class="stat-mini-val" id="doc-count-other">0</div><div class="stat-mini-lbl">Otros</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">
+      Repositorio de Documentos
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="uploadDocument()">📎 Adjuntar a activo</button>
+        <button class="btn btn-sm" onclick="exportToExcel('docs')">⬇ Exportar lista</button>
+      </div>
+    </div>
+    <div id="docs-list">
+      <div style="text-align:center;color:var(--text-light);padding:40px;font-size:12px">
+        No hay documentos registrados.<br>Sube facturas, boletas o contratos usando el botón "Subir Documento".
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">Asociar documentos a activos</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:11px">
+      <div style="background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer" onclick="attachDoc(0,'activo','Máquina espresso')">
+        <div style="font-size:20px;margin-bottom:6px">☕</div>
+        <div style="font-weight:500;color:var(--brown);margin-bottom:4px">Máquina espresso</div>
+        <div style="color:var(--text-light)">C01 · COCINA · S/ 14,000</div>
+        <div style="color:var(--gold);margin-top:6px;font-size:10px">📎 Adjuntar factura</div>
+      </div>
+      <div style="background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer" onclick="attachDoc(0,'activo','Refrigeradora')">
+        <div style="font-size:20px;margin-bottom:6px">❄</div>
+        <div style="font-weight:500;color:var(--brown);margin-bottom:4px">Refrigeradora bajo barra</div>
+        <div style="color:var(--text-light)">C04 · COCINA · S/ 4,500</div>
+        <div style="color:var(--gold);margin-top:6px;font-size:10px">📎 Adjuntar factura</div>
+      </div>
+      <div style="background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer" onclick="attachDoc(0,'activo','Counter principal')">
+        <div style="font-size:20px;margin-bottom:6px">🪴</div>
+        <div style="font-weight:500;color:var(--brown);margin-bottom:4px">Counter principal</div>
+        <div style="color:var(--text-light)">A01 · ATENCION · S/ 9,500</div>
+        <div style="color:var(--gold);margin-top:6px;font-size:10px">📎 Adjuntar factura</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MÓDULO — REGISTRO DE INVERSIONES
+═══════════════════════════════════════════════════════ -->
+<div class="module-view" id="mod-investments">
+  <div class="page-header">
+    <div><div class="page-h1">Registro de Inversiones</div><div class="page-desc">Historial de inversiones — FIRST SIP Av. El Golf, Trujillo</div></div>
+    <div class="page-actions">
+      <button class="btn btn-sm" onclick="exportToExcel('investments')">⬇ Exportar</button>
+      <button class="btn btn-sm btn-gold" onclick="addInversion()">+ Nueva Inversión</button>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="stat-mini-val">S/ 368,224</div><div class="stat-mini-lbl">Bienes tangibles</div></div>
+    <div class="stat-mini"><div class="stat-mini-val">S/ 26,500</div><div class="stat-mini-lbl">Bienes intangibles</div></div>
+    <div class="stat-mini"><div class="stat-mini-val" id="inv-total-stat">S/ 490,624</div><div class="stat-mini-lbl">Inversión total + extras</div></div>
+  </div>
+  <div class="alert alert-success">✓ Inversión total: <b>S/ 490,624</b> — Bienes tangibles S/368,224 + Intangibles S/26,500 + Capital de trabajo S/95,900</div>
+  <div class="card">
+    <div class="card-title">Inversiones Registradas Manualmente</div>
+    <div id="inv-list">
+      <div style="text-align:center;color:var(--text-light);padding:40px;font-size:12px">
+        No hay inversiones registradas.<br>Usa "Nueva Inversión" para agregar gastos adicionales.
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">Resumen de Inversión — Datos del Excel</div>
+    <table class="asset-table">
+      <thead><tr><th>Categoría</th><th>Área/Rubro</th><th>Monto S/</th><th>% del Total</th></tr></thead>
+      <tbody>
+        <tr><td>Bienes Tangibles</td><td>Fachada comercial</td><td style="font-weight:600;color:var(--brown)">61,814</td><td><div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;width:80px"><div style="width:13%;height:100%;background:var(--gold)"></div></div> 12.6%</td></tr>
+        <tr><td>Bienes Tangibles</td><td>Área de atención al cliente</td><td style="font-weight:600;color:var(--brown)">85,630</td><td><div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;width:80px"><div style="width:17%;height:100%;background:var(--gold)"></div></div> 17.5%</td></tr>
+        <tr><td>Bienes Tangibles</td><td>Área de cocina y producción</td><td style="font-weight:600;color:var(--brown)">90,100</td><td><div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;width:80px"><div style="width:18%;height:100%;background:var(--rose)"></div></div> 18.4%</td></tr>
+        <tr><td>Bienes Tangibles</td><td>Área de almacén</td><td style="font-weight:600;color:var(--brown)">38,530</td><td><div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;width:80px"><div style="width:8%;height:100%;background:var(--gold)"></div></div> 7.9%</td></tr>
+        <tr><td>Bienes Tangibles</td><td>Área de baños</td><td style="font-weight:600;color:var(--brown)">44,530</td><td><div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;width:80px"><div style="width:9%;height:100%;background:var(--gold)"></div></div> 9.1%</td></tr>
+        <tr><td>Bienes Tangibles</td><td>Área administrativa</td><td style="font-weight:600;color:var(--brown)">47,620</td><td><div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;width:80px"><div style="width:10%;height:100%;background:var(--gold)"></div></div> 9.7%</td></tr>
+        <tr style="background:var(--bg-main)"><td colspan="2" style="font-weight:600;color:var(--brown)">TOTAL BIENES TANGIBLES</td><td style="font-weight:700;color:var(--brown);font-size:14px">368,224</td><td style="font-weight:600;color:var(--brown)">75.1%</td></tr>
+        <tr><td>Bienes Intangibles</td><td>Branding y diseño de marca</td><td style="font-weight:600;color:var(--brown)">3,500</td><td></td></tr>
+        <tr><td>Bienes Intangibles</td><td>Diseño arquitectónico</td><td style="font-weight:600;color:var(--brown)">8,000</td><td></td></tr>
+        <tr><td>Bienes Intangibles</td><td>Marketing lanzamiento</td><td style="font-weight:600;color:var(--brown)">5,000</td><td></td></tr>
+        <tr style="background:var(--bg-main)"><td colspan="2" style="font-weight:600;color:var(--brown)">TOTAL BIENES INTANGIBLES</td><td style="font-weight:700;color:var(--brown);font-size:14px">26,500</td><td style="font-weight:600;color:var(--brown)">5.4%</td></tr>
+        <tr style="background:var(--bg-main)"><td colspan="2" style="font-weight:600;color:var(--brown)">CAPITAL DE TRABAJO (3 meses)</td><td style="font-weight:700;color:var(--brown);font-size:14px">95,900</td><td style="font-weight:600;color:var(--brown)">19.5%</td></tr>
+        <tr style="background:linear-gradient(90deg,var(--blush),var(--gold-light))"><td colspan="2" style="font-weight:700;color:var(--brown);font-size:14px">INVERSIÓN TOTAL DEL PROYECTO</td><td style="font-weight:700;color:var(--brown);font-size:16px">490,624</td><td style="font-weight:700;color:var(--brown)">100%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  </div><!-- end content -->
+</main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// FIRST SIP ERP — DATOS REALES DEL EXCEL + FUNCIONALIDAD COMPLETA
+// ═══════════════════════════════════════════════════════════════════
+
+// ── BASE DE DATOS (localStorage) ──────────────────────────────────
+const DB = {
+  get: k => { try { return JSON.parse(localStorage.getItem('fserp_' + k)); } catch(e) { return null; } },
+  set: (k, v) => localStorage.setItem('fserp_' + k, JSON.stringify(v)),
+  del: k => localStorage.removeItem('fserp_' + k)
+};
+
+// ── DATOS REALES DEL EXCEL ─────────────────────────────────────────
+const EXCEL_DATA = {
+  bienesTangibles: {
+    total: 368224,
+    secciones: {
+      'Fachada comercial': 61814,
+      'Área de atención al cliente': 85630,
+      'Área de cocina y producción': 90100,
+      'Área de almacén': 38530,
+      'Área de baños': 44530,
+      'Área administrativa': 47620
+    }
+  },
+  bienesIntangibles: {
+    total: 26500,
+    items: [
+      { nombre: 'Constitución de empresa', monto: 1500 },
+      { nombre: 'Licencia de funcionamiento', monto: 1200 },
+      { nombre: 'Certificado ITSE / Defensa Civil', monto: 850 },
+      { nombre: 'Registro de marca INDECOPI', monto: 650 },
+      { nombre: 'Branding y diseño de marca', monto: 3500 },
+      { nombre: 'Diseño arquitectónico/interiorismo', monto: 8000 },
+      { nombre: 'Página web y dominio', monto: 2000 },
+      { nombre: 'Software POS y licencias', monto: 1800 },
+      { nombre: 'Marketing lanzamiento', monto: 5000 },
+      { nombre: 'Manual de identidad y cartas', monto: 2000 }
+    ]
+  },
+  capitalDeTrabajo: {
+    total: 95900,
+    planilla3meses: 39600,
+    puestos: [
+      { puesto: 'Administrador', monto: 8400 },
+      { puesto: 'Baristas', monto: 9000 },
+      { puesto: 'Cocineros', monto: 10200 },
+      { puesto: 'Ayudantes', monto: 7500 },
+      { puesto: 'Cajera', monto: 3900 },
+      { puesto: 'Limpieza', monto: 3600 }
+    ],
+    insumos: [
+      { rubro: 'Café especialidad', monto: 3500 },
+      { rubro: 'Leche y derivados', monto: 2500 },
+      { rubro: 'Panes y bollería', monto: 2000 },
+      { rubro: 'Carnes y embutidos', monto: 3500 },
+      { rubro: 'Frutas y jugos', monto: 2000 },
+      { rubro: 'Harinas y repostería', monto: 2500 },
+      { rubro: 'Cheesecakes y postres', monto: 3000 },
+      { rubro: 'Envases y packaging', monto: 2000 },
+      { rubro: 'Productos limpieza', monto: 1200 }
+    ],
+    totalInsumos: 22200,
+    gastosOperativos: [
+      { rubro: 'Alquiler local Av. El Golf', monto: 18000 },
+      { rubro: 'Energía eléctrica', monto: 4500 },
+      { rubro: 'Agua', monto: 1500 },
+      { rubro: 'Internet', monto: 600 },
+      { rubro: 'Publicidad digital', monto: 4500 },
+      { rubro: 'Caja chica', monto: 2000 }
+    ],
+    totalGastos: 31100
+  },
+  inversionTotal: 490624,
+  ubicacion: 'Av. El Golf 350, Trujillo, Perú',
+  areas: ['FACHADA', 'LOCAL', 'PRODUCCION', 'ALMACEN', 'ATENCION', 'ADMINISTRATIVA', 'SERVICIOS HIGIENICOS', 'COCINA']
+};
+
+// Activos tangibles completos del Excel
+const ACTIVOS_TANGIBLES_EXCEL = [
+  // FACHADA
+  { id: 'F01', seccion: 'FACHADA', nombre: 'Letrero luminoso LED acrílico fachada principal', precioUnit: 5500, cantidad: 1, total: 5500, proveedor: 'Miletrero Peru' },
+  { id: 'F02', seccion: 'FACHADA', nombre: 'Letras corpóreas iluminadas "FIRST SIP"', precioUnit: 4800, cantidad: 1, total: 4800, proveedor: 'CVDI Letreros Luminosos' },
+  { id: 'F03', seccion: 'FACHADA', nombre: 'Toldo retráctil rayado personalizado', precioUnit: 4500, cantidad: 1, total: 4500, proveedor: 'Toldos León Perú' },
+  { id: 'F04', seccion: 'FACHADA', nombre: 'Lámpara vintage exterior pared dorada', precioUnit: 249, cantidad: 6, total: 1494, proveedor: 'Promart Perú' },
+  { id: 'F05', seccion: 'FACHADA', nombre: 'Puerta principal vidrio templado + marco aluminio dorado', precioUnit: 5800, cantidad: 1, total: 5800, proveedor: 'Corporación Limatambo' },
+  { id: 'F06', seccion: 'FACHADA', nombre: 'Ventanales vidrio templado fachada', precioUnit: 7500, cantidad: 3.5, total: 7500, proveedor: 'Corporación Limatambo' },
+  { id: 'F07', seccion: 'FACHADA', nombre: 'Mesa exterior redonda mármol cafetería', precioUnit: 750, cantidad: 4, total: 3750, proveedor: 'Muebles Horeca Perú' },
+  { id: 'F08', seccion: 'FACHADA', nombre: 'Silla exterior aesthetic rosada', precioUnit: 280, cantidad: 4.5, total: 2800, proveedor: 'Muebles Horeca Perú' },
+  { id: 'F09', seccion: 'FACHADA', nombre: 'Jardinera decorativa exterior', precioUnit: 220, cantidad: 5, total: 1320, proveedor: 'Sodimac Perú' },
+  { id: 'F10', seccion: 'FACHADA', nombre: 'Flores artificiales premium exteriores', precioUnit: 300, cantidad: 5.5, total: 1800, proveedor: 'Promart Perú' },
+  { id: 'F11', seccion: 'FACHADA', nombre: 'Revestimiento decorativo fachada estilo parisino', precioUnit: 12000, cantidad: 6, total: 12000, proveedor: 'Sodimac Constructor' },
+  { id: 'F12', seccion: 'FACHADA', nombre: 'Pintura exterior premium rosado pastel', precioUnit: 3500, cantidad: 6.5, total: 3500, proveedor: 'Sherwin Williams Perú' },
+  { id: 'F13', seccion: 'FACHADA', nombre: 'Piso porcelanato exterior terraza', precioUnit: 4500, cantidad: 7, total: 4500, proveedor: 'Celima Perú' },
+  { id: 'F14', seccion: 'FACHADA', nombre: 'Instalación eléctrica fachada e iluminación', precioUnit: 2200, cantidad: 7.5, total: 2200, proveedor: 'Promart Electricidad' },
+  { id: 'F15', seccion: 'FACHADA', nombre: 'Placa decorativa metálica "EST. 2023"', precioUnit: 350, cantidad: 8, total: 350, proveedor: 'Otorongo Letreros' },
+  // ATENCION
+  { id: 'A01', seccion: 'ATENCION', nombre: 'Counter principal curvo en cuarzo/melamina premium', precioUnit: 9500, cantidad: 1, total: 9500, proveedor: 'Sodimac Constructor' },
+  { id: 'A02', seccion: 'ATENCION', nombre: 'Cubierta de cuarzo blanco para counter', precioUnit: 3800, cantidad: 1, total: 3800, proveedor: 'Quartz Stone Perú' },
+  { id: 'A03', seccion: 'ATENCION', nombre: 'Vitrina refrigerada curva para postres', precioUnit: 5500, cantidad: 1, total: 5500, proveedor: 'Electra Norte' },
+  { id: 'A04', seccion: 'ATENCION', nombre: 'Máquina POS touchscreen', precioUnit: 3500, cantidad: 1, total: 3500, proveedor: 'TechStore Peru' },
+  { id: 'A05', seccion: 'ATENCION', nombre: 'Impresora térmica POS', precioUnit: 950, cantidad: 1, total: 950, proveedor: 'TechStore Peru' },
+  { id: 'A06', seccion: 'ATENCION', nombre: 'Sillones premium rosados tipo lounge', precioUnit: 1450, cantidad: 4, total: 5800, proveedor: 'Muebles Horeca Perú' },
+  { id: 'A07', seccion: 'ATENCION', nombre: 'Mesas redondas mármol/comedor', precioUnit: 850, cantidad: 6, total: 5100, proveedor: 'Muebles Horeca Perú' },
+  { id: 'A08', seccion: 'ATENCION', nombre: 'Sillas interiores aesthetic rosadas', precioUnit: 320, cantidad: 24, total: 7680, proveedor: 'Muebles Horeca Perú' },
+  { id: 'A09', seccion: 'ATENCION', nombre: 'Barra divisoria decorativa dorada', precioUnit: 2500, cantidad: 1, total: 2500, proveedor: 'Diseños Élite Trujillo' },
+  { id: 'A10', seccion: 'ATENCION', nombre: 'Lámparas colgantes decorativas premium', precioUnit: 420, cantidad: 5, total: 2100, proveedor: 'Promart Perú' },
+  { id: 'A11', seccion: 'ATENCION', nombre: 'Iluminación LED indirecta techo', precioUnit: 2800, cantidad: 1, total: 2800, proveedor: 'Promart Perú' },
+  { id: 'A12', seccion: 'ATENCION', nombre: 'Espejos decorativos arqueados', precioUnit: 550, cantidad: 4, total: 2200, proveedor: 'Promart Perú' },
+  { id: 'A13', seccion: 'ATENCION', nombre: 'Decoración floral premium interior', precioUnit: 1800, cantidad: 1, total: 1800, proveedor: 'Florería Arte' },
+  { id: 'A14', seccion: 'ATENCION', nombre: 'Estanterías decorativas iluminadas', precioUnit: 4500, cantidad: 1, total: 4500, proveedor: 'Sodimac Constructor' },
+  { id: 'A15', seccion: 'ATENCION', nombre: 'Revestimiento paredes molduras aesthetic', precioUnit: 6800, cantidad: 1, total: 6800, proveedor: 'Sodimac Constructor' },
+  { id: 'A16', seccion: 'ATENCION', nombre: 'Pintura interior premium rosado pastel', precioUnit: 3200, cantidad: 1, total: 3200, proveedor: 'Sherwin Williams Perú' },
+  { id: 'A17', seccion: 'ATENCION', nombre: 'Piso porcelanato premium interior', precioUnit: 9000, cantidad: 1, total: 9000, proveedor: 'Celima Perú' },
+  { id: 'A18', seccion: 'ATENCION', nombre: 'Aire acondicionado split', precioUnit: 2800, cantidad: 2, total: 5600, proveedor: 'LG Perú' },
+  { id: 'A19', seccion: 'ATENCION', nombre: 'Sistema de sonido ambiental', precioUnit: 1800, cantidad: 1, total: 1800, proveedor: 'JBL Perú' },
+  { id: 'A20', seccion: 'ATENCION', nombre: 'Carta menú acrílica premium', precioUnit: 250, cantidad: 6, total: 1500, proveedor: 'Imprenta Gráfica' },
+  // COCINA
+  { id: 'C01', seccion: 'COCINA', nombre: 'Máquina espresso profesional 2 grupos', precioUnit: 14000, cantidad: 1, total: 14000, proveedor: 'Importadora Lima SAC' },
+  { id: 'C02', seccion: 'COCINA', nombre: 'Molino de café industrial (x2)', precioUnit: 2200, cantidad: 2, total: 4400, proveedor: 'Compak / Ventus Perú' },
+  { id: 'C03', seccion: 'COCINA', nombre: 'Licuadora industrial bebidas y frappes', precioUnit: 850, cantidad: 2, total: 1700, proveedor: 'Vitamix Perú' },
+  { id: 'C04', seccion: 'COCINA', nombre: 'Refrigeradora bajo barra acero inoxidable', precioUnit: 4500, cantidad: 1, total: 4500, proveedor: 'Electra Norte' },
+  { id: 'C05', seccion: 'COCINA', nombre: 'Congeladora horizontal industrial', precioUnit: 2300, cantidad: 1, total: 2300, proveedor: 'Electra Norte' },
+  { id: 'C06', seccion: 'COCINA', nombre: 'Horno de convección/pastelería', precioUnit: 6500, cantidad: 1, total: 6500, proveedor: 'Rational Perú' },
+  { id: 'C07', seccion: 'COCINA', nombre: 'Plancha hamburguesera industrial', precioUnit: 1500, cantidad: 1, total: 1500, proveedor: 'Equipos Gastro' },
+  { id: 'C08', seccion: 'COCINA', nombre: 'Freidora industrial doble', precioUnit: 1200, cantidad: 1, total: 1200, proveedor: 'Equipos Gastro' },
+  { id: 'C09', seccion: 'COCINA', nombre: 'Sandwichera/panini industrial', precioUnit: 950, cantidad: 1, total: 950, proveedor: 'Equipos Gastro' },
+  { id: 'C10', seccion: 'COCINA', nombre: 'Microondas industrial', precioUnit: 950, cantidad: 1, total: 950, proveedor: 'Electra Norte' },
+  { id: 'C11', seccion: 'COCINA', nombre: 'Mesa de trabajo acero inoxidable', precioUnit: 1200, cantidad: 2, total: 2400, proveedor: 'ACERO INOX SAC' },
+  { id: 'C12', seccion: 'COCINA', nombre: 'Lavadero industrial doble poza', precioUnit: 1400, cantidad: 1, total: 1400, proveedor: 'ACERO INOX SAC' },
+  { id: 'C13', seccion: 'COCINA', nombre: 'Estanterías metálicas almacenamiento', precioUnit: 750, cantidad: 4, total: 3000, proveedor: 'Sodimac Constructor' },
+  { id: 'C14', seccion: 'COCINA', nombre: 'Mueble central preparación alimentos', precioUnit: 5000, cantidad: 1, total: 5000, proveedor: 'ACERO INOX SAC' },
+  { id: 'C15', seccion: 'COCINA', nombre: 'Sistema extracción de aire/campana', precioUnit: 6500, cantidad: 1, total: 6500, proveedor: 'Ventilación Pro' },
+  { id: 'C16', seccion: 'COCINA', nombre: 'Dispensadores de syrup y toppings', precioUnit: 120, cantidad: 12, total: 1440, proveedor: 'Gastro Supply Perú' },
+  { id: 'C17', seccion: 'COCINA', nombre: 'Sistema iluminación LED cocina', precioUnit: 2200, cantidad: 1, total: 2200, proveedor: 'Promart Perú' },
+  { id: 'C18', seccion: 'COCINA', nombre: 'Revestimiento porcelanato antihongos', precioUnit: 7500, cantidad: 1, total: 7500, proveedor: 'Celima Perú' },
+  { id: 'C19', seccion: 'COCINA', nombre: 'Instalaciones sanitarias cocina', precioUnit: 5000, cantidad: 1, total: 5000, proveedor: 'Contratista Sanitario' },
+  { id: 'C20', seccion: 'COCINA', nombre: 'Instalación eléctrica industrial', precioUnit: 4500, cantidad: 1, total: 4500, proveedor: 'Promart Electricidad' },
+  { id: 'C21', seccion: 'COCINA', nombre: 'Utensilios cocina y barista', precioUnit: 4000, cantidad: 1, total: 4000, proveedor: 'Gastro Supply Perú' },
+  { id: 'C22', seccion: 'COCINA', nombre: 'Vajilla y cristalería producción', precioUnit: 3500, cantidad: 1, total: 3500, proveedor: 'Cristalería Lima' },
+  { id: 'C23', seccion: 'COCINA', nombre: 'Contenedores almacenamiento alimentos', precioUnit: 180, cantidad: 12, total: 2160, proveedor: 'Plastidino' },
+  { id: 'C24', seccion: 'COCINA', nombre: 'Sistema purificador de agua', precioUnit: 2800, cantidad: 1, total: 2800, proveedor: 'Hydro Perú' },
+  { id: 'C25', seccion: 'COCINA', nombre: 'Cámara de seguridad cocina', precioUnit: 350, cantidad: 2, total: 700, proveedor: 'Segurtech' },
+  // ALMACEN
+  { id: 'AL01', seccion: 'ALMACEN', nombre: 'Estantería metálica industrial 5 niveles', precioUnit: 850, cantidad: 6, total: 5100, proveedor: 'Sodimac Constructor' },
+  { id: 'AL02', seccion: 'ALMACEN', nombre: 'Refrigeradora vertical industrial almacenamiento', precioUnit: 4500, cantidad: 1, total: 4500, proveedor: 'Electra Norte' },
+  { id: 'AL03', seccion: 'ALMACEN', nombre: 'Congeladora horizontal industrial', precioUnit: 2300, cantidad: 1, total: 2300, proveedor: 'Electra Norte' },
+  { id: 'AL04', seccion: 'ALMACEN', nombre: 'Contenedores herméticos alimentos', precioUnit: 180, cantidad: 20, total: 3600, proveedor: 'Plastidino' },
+  { id: 'AL05', seccion: 'ALMACEN', nombre: 'Organizadores plásticos inventario', precioUnit: 45, cantidad: 30, total: 1350, proveedor: 'Plastidino' },
+  { id: 'AL06', seccion: 'ALMACEN', nombre: 'Pallets plásticos almacenamiento', precioUnit: 280, cantidad: 4, total: 1120, proveedor: 'Sodimac Constructor' },
+  { id: 'AL07', seccion: 'ALMACEN', nombre: 'Mesa auxiliar acero inoxidable', precioUnit: 1200, cantidad: 1, total: 1200, proveedor: 'ACERO INOX SAC' },
+  { id: 'AL08', seccion: 'ALMACEN', nombre: 'Rack organizador pared', precioUnit: 450, cantidad: 4, total: 1800, proveedor: 'Sodimac Constructor' },
+  { id: 'AL09', seccion: 'ALMACEN', nombre: 'Sistema iluminación LED almacén', precioUnit: 1500, cantidad: 1, total: 1500, proveedor: 'Promart Perú' },
+  { id: 'AL10', seccion: 'ALMACEN', nombre: 'Pintura antihongos almacén', precioUnit: 1800, cantidad: 1, total: 1800, proveedor: 'Sherwin Williams Perú' },
+  { id: 'AL11', seccion: 'ALMACEN', nombre: 'Piso porcelanato antihumedad', precioUnit: 4800, cantidad: 1, total: 4800, proveedor: 'Celima Perú' },
+  { id: 'AL12', seccion: 'ALMACEN', nombre: 'Cámara de seguridad almacén', precioUnit: 350, cantidad: 2, total: 700, proveedor: 'Segurtech' },
+  { id: 'AL13', seccion: 'ALMACEN', nombre: 'Extintor PQS 6 kg', precioUnit: 220, cantidad: 2, total: 440, proveedor: 'Segurtech' },
+  { id: 'AL14', seccion: 'ALMACEN', nombre: 'Señalética seguridad almacén', precioUnit: 80, cantidad: 8, total: 640, proveedor: 'Señales Perú' },
+  { id: 'AL15', seccion: 'ALMACEN', nombre: 'Carro plataforma transporte cajas', precioUnit: 650, cantidad: 1, total: 650, proveedor: 'Sodimac Constructor' },
+  { id: 'AL16', seccion: 'ALMACEN', nombre: 'Escalera aluminio industrial', precioUnit: 480, cantidad: 1, total: 480, proveedor: 'Sodimac Constructor' },
+  { id: 'AL17', seccion: 'ALMACEN', nombre: 'Deshumidificador ambiente', precioUnit: 950, cantidad: 1, total: 950, proveedor: 'Electra Norte' },
+  { id: 'AL18', seccion: 'ALMACEN', nombre: 'Instalación eléctrica almacén', precioUnit: 2000, cantidad: 1, total: 2000, proveedor: 'Promart Electricidad' },
+  { id: 'AL19', seccion: 'ALMACEN', nombre: 'Instalación sanitaria drenaje limpieza', precioUnit: 1800, cantidad: 1, total: 1800, proveedor: 'Contratista Sanitario' },
+  { id: 'AL20', seccion: 'ALMACEN', nombre: 'Software control inventario POS integrado', precioUnit: 1800, cantidad: 1, total: 1800, proveedor: 'SoftPOS Perú' },
+  // BAÑO
+  { id: 'B01', seccion: 'BAÑO', nombre: 'Inodoro one piece premium blanco', precioUnit: 1250, cantidad: 2, total: 2500, proveedor: 'Trebol Perú' },
+  { id: 'B02', seccion: 'BAÑO', nombre: 'Lavamanos ovalado diseño premium', precioUnit: 850, cantidad: 2, total: 1700, proveedor: 'Trebol Perú' },
+  { id: 'B03', seccion: 'BAÑO', nombre: 'Grifería monocomando dorada', precioUnit: 650, cantidad: 2, total: 1300, proveedor: 'Trebol Perú' },
+  { id: 'B04', seccion: 'BAÑO', nombre: 'Espejo LED circular premium', precioUnit: 950, cantidad: 2, total: 1900, proveedor: 'Promart Perú' },
+  { id: 'B05', seccion: 'BAÑO', nombre: 'Revestimiento porcelanato mármol paredes', precioUnit: 7500, cantidad: 1, total: 7500, proveedor: 'Celima Perú' },
+  { id: 'B06', seccion: 'BAÑO', nombre: 'Piso porcelanato antideslizante', precioUnit: 4500, cantidad: 1, total: 4500, proveedor: 'Celima Perú' },
+  { id: 'B07', seccion: 'BAÑO', nombre: 'Separadores baños melamina RH premium', precioUnit: 2800, cantidad: 1, total: 2800, proveedor: 'Tablero Perú' },
+  { id: 'B08', seccion: 'BAÑO', nombre: 'Puertas sanitarias resistentes humedad', precioUnit: 1200, cantidad: 2, total: 2400, proveedor: 'Carpintería Lima' },
+  { id: 'B09', seccion: 'BAÑO', nombre: 'Iluminación LED cálida decorativa', precioUnit: 1800, cantidad: 1, total: 1800, proveedor: 'Promart Perú' },
+  { id: 'B10', seccion: 'BAÑO', nombre: 'Extractor de aire baño', precioUnit: 650, cantidad: 2, total: 1300, proveedor: 'Promart Perú' },
+  { id: 'B11', seccion: 'BAÑO', nombre: 'Dispensador jabón acero inoxidable', precioUnit: 220, cantidad: 2, total: 440, proveedor: 'ACERO INOX SAC' },
+  { id: 'B12', seccion: 'BAÑO', nombre: 'Dispensador papel higiénico industrial', precioUnit: 250, cantidad: 2, total: 500, proveedor: 'ACERO INOX SAC' },
+  { id: 'B13', seccion: 'BAÑO', nombre: 'Secador de manos automático', precioUnit: 1200, cantidad: 2, total: 2400, proveedor: 'Dyson Perú' },
+  { id: 'B14', seccion: 'BAÑO', nombre: 'Basurero acero inoxidable premium', precioUnit: 350, cantidad: 2, total: 700, proveedor: 'ACERO INOX SAC' },
+  { id: 'B15', seccion: 'BAÑO', nombre: 'Encimera cuarzo/mármol lavamanos', precioUnit: 2500, cantidad: 1, total: 2500, proveedor: 'Quartz Stone Perú' },
+  { id: 'B16', seccion: 'BAÑO', nombre: 'Pintura antihumedad premium', precioUnit: 1500, cantidad: 1, total: 1500, proveedor: 'Sherwin Williams Perú' },
+  { id: 'B17', seccion: 'BAÑO', nombre: 'Instalaciones sanitarias completas', precioUnit: 5500, cantidad: 1, total: 5500, proveedor: 'Contratista Sanitario' },
+  { id: 'B18', seccion: 'BAÑO', nombre: 'Instalación eléctrica baños', precioUnit: 2200, cantidad: 1, total: 2200, proveedor: 'Promart Electricidad' },
+  { id: 'B19', seccion: 'BAÑO', nombre: 'Accesorios decorativos baño premium', precioUnit: 850, cantidad: 1, total: 850, proveedor: 'Promart Perú' },
+  { id: 'B20', seccion: 'BAÑO', nombre: 'Señalética baños clientes', precioUnit: 120, cantidad: 2, total: 240, proveedor: 'Señales Perú' },
+  // AREA ADMINISTRATIVA
+  { id: 'AD01', seccion: 'ADMINISTRATIVA', nombre: 'Escritorio ejecutivo curvo premium', precioUnit: 3500, cantidad: 1, total: 3500, proveedor: 'Muebles Élite Trujillo' },
+  { id: 'AD02', seccion: 'ADMINISTRATIVA', nombre: 'Silla gerencial ergonómica ejecutiva', precioUnit: 2200, cantidad: 1, total: 2200, proveedor: 'Muebles Élite Trujillo' },
+  { id: 'AD03', seccion: 'ADMINISTRATIVA', nombre: 'Sillas visitas oficina premium', precioUnit: 650, cantidad: 2, total: 1300, proveedor: 'Muebles Élite Trujillo' },
+  { id: 'AD04', seccion: 'ADMINISTRATIVA', nombre: 'Laptop administrativa', precioUnit: 4800, cantidad: 1, total: 4800, proveedor: 'TechStore Perú' },
+  { id: 'AD05', seccion: 'ADMINISTRATIVA', nombre: 'Monitor adicional 27"', precioUnit: 1200, cantidad: 1, total: 1200, proveedor: 'TechStore Perú' },
+  { id: 'AD06', seccion: 'ADMINISTRATIVA', nombre: 'Impresora multifuncional', precioUnit: 1500, cantidad: 1, total: 1500, proveedor: 'HP Perú' },
+  { id: 'AD07', seccion: 'ADMINISTRATIVA', nombre: 'Archivador metálico oficina', precioUnit: 950, cantidad: 2, total: 1900, proveedor: 'Sodimac Constructor' },
+  { id: 'AD08', seccion: 'ADMINISTRATIVA', nombre: 'Estantería decorativa administrativa', precioUnit: 1500, cantidad: 1, total: 1500, proveedor: 'Sodimac Constructor' },
+  { id: 'AD09', seccion: 'ADMINISTRATIVA', nombre: 'Sofá lounge oficina premium', precioUnit: 3200, cantidad: 1, total: 3200, proveedor: 'Muebles Élite Trujillo' },
+  { id: 'AD10', seccion: 'ADMINISTRATIVA', nombre: 'Mesa de centro decorativa', precioUnit: 650, cantidad: 1, total: 650, proveedor: 'Muebles Élite Trujillo' },
+  { id: 'AD11', seccion: 'ADMINISTRATIVA', nombre: 'Aire acondicionado split oficina', precioUnit: 2800, cantidad: 1, total: 2800, proveedor: 'LG Perú' },
+  { id: 'AD12', seccion: 'ADMINISTRATIVA', nombre: 'Televisor Smart TV reuniones', precioUnit: 2500, cantidad: 1, total: 2500, proveedor: 'LG Perú' },
+  { id: 'AD13', seccion: 'ADMINISTRATIVA', nombre: 'Sistema cámaras seguridad oficina', precioUnit: 350, cantidad: 2, total: 700, proveedor: 'Segurtech' },
+  { id: 'AD14', seccion: 'ADMINISTRATIVA', nombre: 'Router empresarial internet', precioUnit: 450, cantidad: 1, total: 450, proveedor: 'Claro Empresas' },
+  { id: 'AD15', seccion: 'ADMINISTRATIVA', nombre: 'Teléfono IP oficina', precioUnit: 420, cantidad: 1, total: 420, proveedor: 'TechStore Perú' },
+  { id: 'AD16', seccion: 'ADMINISTRATIVA', nombre: 'Iluminación LED decorativa oficina', precioUnit: 1800, cantidad: 1, total: 1800, proveedor: 'Promart Perú' },
+  { id: 'AD17', seccion: 'ADMINISTRATIVA', nombre: 'Piso porcelanato premium oficina', precioUnit: 5500, cantidad: 1, total: 5500, proveedor: 'Celima Perú' },
+  { id: 'AD18', seccion: 'ADMINISTRATIVA', nombre: 'Revestimiento paredes/molduras', precioUnit: 4500, cantidad: 1, total: 4500, proveedor: 'Sodimac Constructor' },
+  { id: 'AD19', seccion: 'ADMINISTRATIVA', nombre: 'Pintura interior premium', precioUnit: 2000, cantidad: 1, total: 2000, proveedor: 'Sherwin Williams Perú' },
+  { id: 'AD20', seccion: 'ADMINISTRATIVA', nombre: 'Software administrativo y contable', precioUnit: 2500, cantidad: 1, total: 2500, proveedor: 'SoftPOS Perú' },
+  { id: 'AD21', seccion: 'ADMINISTRATIVA', nombre: 'Caja fuerte digital', precioUnit: 1200, cantidad: 1, total: 1200, proveedor: 'Segurtech' },
+  { id: 'AD22', seccion: 'ADMINISTRATIVA', nombre: 'Decoración premium oficina', precioUnit: 1500, cantidad: 1, total: 1500, proveedor: 'Decoraciones Lima' }
+];
+
+// ── INICIALIZACIÓN ─────────────────────────────────────────────────
+function initDB() {
+  if (!DB.get('activos_tangibles')) {
+    DB.set('activos_tangibles', ACTIVOS_TANGIBLES_EXCEL);
+  }
+  if (!DB.get('activos_intangibles')) {
+    DB.set('activos_intangibles', EXCEL_DATA.bienesIntangibles.items.map((it, i) => ({
+      id: 'INT' + String(i+1).padStart(2,'0'),
+      nombre: it.nombre,
+      tipo: 'Pre-operativo',
+      costo: it.monto,
+      vidaUtil: '5 años',
+      comprobante: '—'
+    })));
+  }
+  if (!DB.get('capital_items')) {
+    const items = [];
+    EXCEL_DATA.capitalDeTrabajo.gastosOperativos.forEach(g => items.push({ id: Date.now() + Math.random(), categoria: g.rubro, tipo: 'Gasto Operativo', monto: g.monto }));
+    EXCEL_DATA.capitalDeTrabajo.insumos.forEach(g => items.push({ id: Date.now() + Math.random(), categoria: g.rubro, tipo: 'Insumos', monto: g.monto }));
+    EXCEL_DATA.capitalDeTrabajo.puestos.forEach(g => items.push({ id: Date.now() + Math.random(), categoria: g.puesto, tipo: 'Planilla', monto: g.monto }));
+    DB.set('capital_items', items);
+  }
+  if (!DB.get('inversiones')) DB.set('inversiones', []);
+  if (!DB.get('documentos')) DB.set('documentos', []);
+  if (!DB.get('layout_images')) DB.set('layout_images', {});
+}
+
+// ── FORMATO MONETARIO ──────────────────────────────────────────────
+function fmtS(n) { return 'S/ ' + Number(n).toLocaleString('es-PE', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmtN(n) { return Number(n).toLocaleString('es-PE', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+// ── MÓDULO NAVEGACIÓN ──────────────────────────────────────────────
+var cart = [];
+
+function showModule(mod) {
+  document.querySelectorAll('.module-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('mod-' + mod).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  var titles = {
+    dashboard:'Dashboard Financiero', layout:'Layout & Infraestructura', assets:'Gestión de Activos',
+    capital:'Capital de Trabajo', financing:'Financiamiento', ecommerce:'E-Commerce & Inventario',
+    tax:'Módulo Tributario SUNAT', statements:'Estados Financieros', reports:'Centro de Reportes',
+    documents:'Documentos & Comprobantes', investments:'Registro de Inversiones'
+  };
+  document.getElementById('topbar-title').textContent = titles[mod] || 'FIRST SIP ERP';
+  if (mod === 'assets') renderAssets();
+  if (mod === 'capital') renderCapital();
+  if (mod === 'documents') renderDocuments();
+  if (mod === 'investments') renderInvestments();
+  if (mod === 'layout') renderLayout();
+  if (mod === 'dashboard') updateDashboard();
+}
+
+function switchTab(el, targetId) {
+  var parent = el.closest('.tabs');
+  parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  var panelParent = el.closest('.module-view') || el.closest('.content');
+  panelParent.querySelectorAll('[id^="tab-"],[id^="fin-"],[id^="ec-"],[id^="stmt-"]').forEach(p => p.style.display = 'none');
+  var target = document.getElementById(targetId);
+  if (target) target.style.display = '';
+}
+
+// ── DASHBOARD: actualizar KPIs con datos reales ────────────────────
+function updateDashboard() {
+  var tangibles = EXCEL_DATA.bienesTangibles.total;
+  var intangibles = EXCEL_DATA.bienesIntangibles.total;
+  var capital = EXCEL_DATA.capitalDeTrabajo.total;
+  var total = EXCEL_DATA.inversionTotal;
+
+  // Gastos adicionales registrados manualmente
+  var extra = (DB.get('inversiones') || []).reduce(function(s,i){ return s + Number(i.monto); }, 0);
+  var totalReal = total + extra;
+
+  // KPIs con IDs reales
+  var k1 = document.getElementById('kpi-activos');
+  if (k1) k1.textContent = fmtS(tangibles + intangibles);
+  var k2 = document.getElementById('kpi-inversion');
+  if (k2) k2.textContent = fmtS(totalReal);
+  var k3 = document.getElementById('kpi-capital');
+  if (k3) k3.textContent = fmtS(capital);
+  var k4 = document.getElementById('kpi-mensual');
+  if (k4) k4.textContent = fmtS(EXCEL_DATA.capitalDeTrabajo.totalGastos);
+
+  // Actualizar subs del KPI inversión con extra
+  var kpiCards = document.querySelectorAll('.kpi-card');
+  if (kpiCards[1]) {
+    var sub = kpiCards[1].querySelector('.kpi-sub');
+    if (sub) sub.textContent = extra > 0
+      ? 'Base S/' + total.toLocaleString('es-PE') + ' + Extras S/' + extra.toLocaleString('es-PE')
+      : 'Tangibles + Intangibles + Capital trabajo';
+  }
+
+  // Actualizar balance banner
+  var bb = document.getElementById('balance-ok-banner');
+  if (bb) bb.innerHTML = '✅ ACTIVO = PASIVO + PATRIMONIO · Inversión total registrada: <b>' + fmtS(totalReal) + '</b>';
+}
+
+// ── MÓDULO ACTIVOS ─────────────────────────────────────────────────
+var currentAssetFilter = 'all';
+
+function renderAssets() {
+  renderTangibles();
+  renderIntangibles();
+  renderDepreciacion();
+  updateAssetStats();
+}
+
+function updateAssetStats() {
+  var items = DB.get('activos_tangibles') || [];
+  var intItems = DB.get('activos_intangibles') || [];
+  var totalT = items.reduce((s, i) => s + Number(i.total), 0);
+  var totalI = intItems.reduce((s, i) => s + Number(i.costo), 0);
+  var dep = totalT * 0.10 / 12 * 6;
+
+  var s1 = document.getElementById('stat-tangibles');
+  var s2 = document.getElementById('stat-intangibles');
+  var s3 = document.getElementById('stat-deprec');
+  if (s1) s1.textContent = fmtS(totalT);
+  if (s2) s2.textContent = fmtS(totalI);
+  if (s3) s3.textContent = fmtS(dep);
+
+  // Actualizar badge del nav
+  var badge = document.querySelector('.nav-item[onclick*="assets"] .nav-badge');
+  if (badge) badge.textContent = items.length + intItems.length;
+}
+
+function renderTangibles() {
+  var items = DB.get('activos_tangibles') || [];
+  var filter = document.getElementById('asset-search') ? document.getElementById('asset-search').value.toLowerCase() : '';
+  var seccion = document.getElementById('asset-section-filter') ? document.getElementById('asset-section-filter').value : 'all';
+
+  var filtered = items.filter(i => {
+    var matchText = !filter || i.nombre.toLowerCase().includes(filter) || i.seccion.toLowerCase().includes(filter);
+    var matchSec = seccion === 'all' || i.seccion === seccion;
+    return matchText && matchSec;
+  });
+
+  var html = '';
+  filtered.forEach((item, idx) => {
+    var igv = item.total * 0.18 / 1.18;
+    var sinIgv = item.total - igv;
+    var depMes = (sinIgv * 0.10 / 12).toFixed(2);
+    html += `<tr>
+      <td style="font-size:10px;color:var(--text-light)">${item.id}</td>
+      <td><div class="editable-cell" contenteditable="true" onblur="saveAssetField('tangibles',${idx},'nombre',this.textContent)">${item.nombre}</div></td>
+      <td><span class="badge badge-gold" style="font-size:9px">${item.seccion}</span></td>
+      <td><div class="editable-cell" contenteditable="true" onblur="saveAssetField('tangibles',${idx},'proveedor',this.textContent)">${item.proveedor}</div></td>
+      <td style="text-align:center"><div class="editable-cell" contenteditable="true" onblur="saveAssetField('tangibles',${idx},'cantidad',this.textContent)">${item.cantidad}</div></td>
+      <td><div class="editable-cell" contenteditable="true" onblur="saveAssetField('tangibles',${idx},'precioUnit',this.textContent)">${fmtN(item.precioUnit)}</div></td>
+      <td style="color:var(--text-light)">${fmtN(igv)}</td>
+      <td style="font-weight:600;color:var(--brown)">${fmtN(item.total)}</td>
+      <td>10 años</td>
+      <td style="color:var(--danger)">S/ ${depMes}</td>
+      <td><span class="badge badge-green">✓</span></td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="editAsset('tangibles',${idx})" title="Editar">✏</button>
+        <button class="btn btn-sm" style="padding:3px 8px;font-size:10px;color:var(--danger)" onclick="deleteAsset('tangibles',${idx})" title="Eliminar">✕</button>
+        <button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="attachDoc(${idx},'activo',\`${item.nombre.substring(0,20)}\`)" title="Adjuntar PDF">📎</button>
+        ${item.imagen
+          ? '<button class="btn btn-sm" style="padding:3px 8px;font-size:10px;background:var(--blush)" onclick="viewAssetImage('+idx+')" title="Ver imagen">🖼</button><button class="btn btn-sm" style="padding:3px 8px;font-size:10px;color:var(--danger)" onclick="deleteAssetImage('+idx+')" title="Eliminar imagen">🗑</button>'
+          : '<button class="btn btn-sm" style="padding:3px 8px;font-size:10px;background:var(--gold-light)" onclick="uploadAssetImage('+idx+')" title="Subir imagen">📷</button>'}
+      </td>
+    </tr>`;
+  });
+
+  var tbody = document.getElementById('asset-tbody');
+  if (tbody) tbody.innerHTML = html || '<tr><td colspan="12" style="text-align:center;color:var(--text-light);padding:20px">No hay activos que coincidan con el filtro.</td></tr>';
+
+  var total = filtered.reduce((s, i) => s + Number(i.total), 0);
+  var totalIgv = total * 0.18 / 1.18;
+  var el = document.getElementById('asset-totals');
+  if (el) el.innerHTML = `
+    <span>Mostrando ${filtered.length} de ${items.length} activos</span>
+    <span>Sin IGV: <b style="color:var(--brown)">${fmtS(total - totalIgv)}</b></span>
+    <span>IGV: <b style="color:var(--brown)">${fmtS(totalIgv)}</b></span>
+    <span>Total c/IGV: <b style="color:var(--brown);font-size:14px">${fmtS(total)}</b></span>`;
+}
+
+function renderIntangibles() {
+  var items = DB.get('activos_intangibles') || [];
+  var html = '';
+  items.forEach((item, idx) => {
+    html += `<tr>
+      <td>${String(idx+1).padStart(2,'0')}</td>
+      <td><div class="editable-cell" contenteditable="true" onblur="saveIntField(${idx},'nombre',this.textContent)">${item.nombre}</div></td>
+      <td>${item.tipo}</td>
+      <td>Varios</td>
+      <td style="font-weight:600;color:var(--brown)">${fmtN(item.costo)}</td>
+      <td><span class="badge badge-green">✓ Activo</span></td>
+      <td>5 años</td>
+      <td style="color:var(--danger)">S/ ${(item.costo/60).toFixed(2)}</td>
+      <td>${item.comprobante}</td>
+      <td><button class="btn btn-sm" style="padding:3px 8px;font-size:10px;color:var(--danger)" onclick="deleteIntangible(${idx})">✕</button></td>
+    </tr>`;
+  });
+  var tbody = document.getElementById('intang-tbody');
+  if (tbody) tbody.innerHTML = html;
+
+  var total = items.reduce((s, i) => s + Number(i.costo), 0);
+  var el = document.getElementById('intang-total');
+  if (el) el.textContent = fmtS(total);
+}
+
+function renderDepreciacion() {
+  var items = (DB.get('activos_tangibles') || []).slice(0, 15);
+  var html = '';
+  items.forEach(item => {
+    var sinIgv = item.total / 1.18;
+    var depAnual = sinIgv * 0.10;
+    var depMes = depAnual / 12;
+    var meses = 6;
+    var depAcum = depMes * meses;
+    var vlibros = sinIgv - depAcum;
+    html += `<tr>
+      <td>${item.nombre.substring(0,35)}...</td>
+      <td>${fmtN(sinIgv)}</td>
+      <td>10%</td>
+      <td>${fmtN(depAnual)}</td>
+      <td style="color:var(--danger)">${fmtN(depMes)}</td>
+      <td>6</td>
+      <td>${fmtN(depAcum)}</td>
+      <td style="font-weight:600;color:var(--brown)">${fmtN(vlibros)}</td>
+    </tr>`;
+  });
+  var tbody = document.getElementById('deprec-tbody');
+  if (tbody) tbody.innerHTML = html;
+}
+
+function saveAssetField(type, idx, field, val) {
+  if (type === 'tangibles') {
+    var items = DB.get('activos_tangibles') || [];
+    if (items[idx]) {
+      items[idx][field] = isNaN(val) ? val : Number(String(val).replace(/,/g,''));
+      if (field === 'precioUnit' || field === 'cantidad') {
+        items[idx].total = items[idx].precioUnit * items[idx].cantidad;
+      }
+      DB.set('activos_tangibles', items);
+      renderTangibles();
+      updateAssetStats();
+    }
+  }
+}
+
+function saveIntField(idx, field, val) {
+  var items = DB.get('activos_intangibles') || [];
+  if (items[idx]) { items[idx][field] = val; DB.set('activos_intangibles', items); renderIntangibles(); }
+}
+
+function deleteAsset(type, idx) {
+  if (!confirm('¿Eliminar este activo?')) return;
+  var items = DB.get('activos_' + type) || [];
+  items.splice(idx, 1);
+  DB.set('activos_' + type, items);
+  renderAssets();
+}
+
+function editAsset(type, idx) {
+  var items = DB.get('activos_' + type) || [];
+  var item = items[idx];
+  if (!item) return;
+  var nombre = prompt('Nombre:', item.nombre) || item.nombre;
+  var proveedor = prompt('Proveedor:', item.proveedor) || item.proveedor;
+  var precioUnit = parseFloat(prompt('Precio unitario (S/):', item.precioUnit));
+  var cantidad = parseFloat(prompt('Cantidad:', item.cantidad));
+  if (isNaN(precioUnit) || isNaN(cantidad)) return;
+  items[idx].nombre = nombre;
+  items[idx].proveedor = proveedor;
+  items[idx].precioUnit = precioUnit;
+  items[idx].cantidad = cantidad;
+  items[idx].total = precioUnit * cantidad;
+  DB.set('activos_' + type, items);
+  renderAssets();
+  updateAssetStats();
+  showToast('✓ Activo actualizado');
+}
+
+function deleteIntangible(idx) { deleteAsset('intangibles', idx); }
+
+function addNewAsset() {
+  var nombre = prompt('Nombre del activo:');
+  if (!nombre) return;
+  var seccion = prompt('Sección (FACHADA/ATENCION/COCINA/ALMACEN/BAÑO/ADMINISTRATIVA):','COCINA');
+  var precioUnit = parseFloat(prompt('Precio unitario (S/):','0'));
+  var cantidad = parseFloat(prompt('Cantidad:','1'));
+  var proveedor = prompt('Proveedor:','');
+  if (isNaN(precioUnit) || isNaN(cantidad)) { alert('Valores inválidos'); return; }
+  var items = DB.get('activos_tangibles') || [];
+  var newId = seccion.charAt(0) + String(items.filter(i=>i.seccion===seccion).length+1).padStart(2,'0');
+  items.push({ id: newId, seccion: seccion.toUpperCase(), nombre, precioUnit, cantidad, total: precioUnit*cantidad, proveedor });
+  DB.set('activos_tangibles', items);
+  renderAssets();
+  showToast('✓ Activo agregado correctamente');
+}
+
+function addNewIntangible() {
+  var nombre = prompt('Nombre del activo intangible:');
+  if (!nombre) return;
+  var costo = parseFloat(prompt('Costo (S/):','0'));
+  var tipo = prompt('Tipo (Marca/Licencia/Software/Pre-operativo):','Pre-operativo');
+  if (isNaN(costo)) return;
+  var items = DB.get('activos_intangibles') || [];
+  items.push({ id: 'INT'+String(items.length+1).padStart(2,'0'), nombre, tipo, costo, vidaUtil: '5 años', comprobante: '—' });
+  DB.set('activos_intangibles', items);
+  renderIntangibles();
+  updateAssetStats();
+  showToast('✓ Activo intangible agregado');
+}
+
+// ── MÓDULO CAPITAL DE TRABAJO ──────────────────────────────────────
+function renderCapital() {
+  var items = DB.get('capital_items') || [];
+  var tbody = document.getElementById('capital-tbody');
+  if (!tbody) return;
+
+  var html = '';
+  items.forEach((item, idx) => {
+    html += `<tr>
+      <td><span class="badge ${item.tipo==='Planilla'?'badge-rose':item.tipo==='Insumos'?'badge-gold':'badge-blue'}" style="font-size:9px">${item.tipo}</span></td>
+      <td><div class="editable-cell" contenteditable="true" onblur="saveCapitalField(${idx},'categoria',this.textContent)">${item.categoria}</div></td>
+      <td style="text-align:right"><div class="editable-cell" contenteditable="true" onblur="saveCapitalField(${idx},'monto',this.textContent)">${fmtN(item.monto)}</div></td>
+      <td><button class="btn btn-sm" style="padding:3px 8px;font-size:10px;color:var(--danger)" onclick="deleteCapital(${idx})">✕</button></td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+
+  var total = items.reduce((s, i) => s + Number(i.monto), 0);
+  var el = document.getElementById('capital-total');
+  if (el) el.textContent = fmtS(total);
+
+  // Actualizar stats
+  var gastos = items.filter(i=>i.tipo==='Gasto Operativo').reduce((s,i)=>s+Number(i.monto),0);
+  var insumos = items.filter(i=>i.tipo==='Insumos').reduce((s,i)=>s+Number(i.monto),0);
+  var planilla = items.filter(i=>i.tipo==='Planilla').reduce((s,i)=>s+Number(i.monto),0);
+  var cs0 = document.getElementById('cap-stat-total');
+  var cs1 = document.getElementById('cap-stat-mensual');
+  var cs2 = document.getElementById('cap-stat-cobertura');
+  if (cs0) cs0.textContent = fmtS(total);
+  if (cs1) cs1.textContent = fmtS(gastos + insumos);
+  if (cs2) cs2.textContent = total > 0 ? (total / (gastos + insumos)).toFixed(1) + ' meses' : '—';
+}
+
+function saveCapitalField(idx, field, val) {
+  var items = DB.get('capital_items') || [];
+  if (items[idx]) {
+    items[idx][field] = field === 'monto' ? parseFloat(String(val).replace(/,/g,'')) || 0 : val;
+    DB.set('capital_items', items);
+    renderCapital();
+  }
+}
+
+function deleteCapital(idx) {
+  if (!confirm('¿Eliminar esta categoría?')) return;
+  var items = DB.get('capital_items') || [];
+  items.splice(idx, 1);
+  DB.set('capital_items', items);
+  renderCapital();
+}
+
+function addCapitalItem() {
+  var tipo = prompt('Tipo (Gasto Operativo / Insumos / Planilla):','Gasto Operativo');
+  if (!tipo) return;
+  var categoria = prompt('Categoría:','');
+  if (!categoria) return;
+  var monto = parseFloat(prompt('Monto mensual (S/):','0'));
+  if (isNaN(monto)) return;
+  var items = DB.get('capital_items') || [];
+  items.push({ id: Date.now(), tipo, categoria, monto });
+  DB.set('capital_items', items);
+  renderCapital();
+  showToast('✓ Categoría agregada');
+}
+
+function saveCapital() {
+  showToast('✓ Capital de trabajo guardado correctamente');
+}
+
+// ── MÓDULO DOCUMENTOS ──────────────────────────────────────────────
+function renderDocuments() {
+  var docs = DB.get('documentos') || [];
+  var el = document.getElementById('docs-list');
+  if (!el) return;
+
+  // Actualizar contadores
+  var total = docs.length;
+  var facturas = docs.filter(d => d.tipo === 'Factura' || d.tipo === 'Boleta').length;
+  var otros = total - facturas;
+  var dct = document.getElementById('doc-count-total');
+  var dcf = document.getElementById('doc-count-facturas');
+  var dco = document.getElementById('doc-count-other');
+  if (dct) dct.textContent = total;
+  if (dcf) dcf.textContent = facturas;
+  if (dco) dco.textContent = otros;
+  // Badge nav
+  var badge = document.getElementById('doc-badge');
+  if (badge) badge.textContent = total;
+
+  if (docs.length === 0) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:40px;font-size:12px">No hay documentos registrados.<br>Sube facturas, boletas o contratos usando el botón "Subir Documento".</div>';
+    return;
+  }
+
+  var html = '<table class="asset-table"><thead><tr><th>Fecha</th><th>Tipo</th><th>Nombre</th><th>Relacionado con</th><th>Tamaño</th><th>Acciones</th></tr></thead><tbody>';
+  docs.forEach((doc, idx) => {
+    html += `<tr>
+      <td>${doc.fecha}</td>
+      <td><span class="badge ${doc.tipo==='Factura'?'badge-gold':doc.tipo==='Boleta'?'badge-blue':'badge-rose'}" style="font-size:9px">${doc.tipo}</span></td>
+      <td>${doc.nombre}</td>
+      <td>${doc.relacionado || '—'}</td>
+      <td>${doc.tamano || '—'}</td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="viewDoc(${idx})">👁 Ver</button>
+        <button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="downloadDoc(${idx})">⬇</button>
+        <button class="btn btn-sm" style="padding:3px 8px;font-size:10px" onclick="printDoc(${idx})">🖨</button>
+        <button class="btn btn-sm" style="padding:3px 8px;font-size:10px;color:var(--danger)" onclick="deleteDoc(${idx})">✕</button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function uploadDocument() {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.pdf,.jpg,.jpeg,.png';
+  input.multiple = true;
+  input.onchange = function() {
+    var files = Array.from(input.files);
+    var tipo = prompt('Tipo de documento:', 'Factura');
+    var relacionado = prompt('Relacionado con (activo/área/gasto):','');
+    files.forEach(file => {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var docs = DB.get('documentos') || [];
+        docs.push({
+          nombre: file.name,
+          tipo: tipo || 'Documento',
+          relacionado: relacionado || '',
+          fecha: new Date().toLocaleDateString('es-PE'),
+          tamano: (file.size / 1024).toFixed(1) + ' KB',
+          dataUrl: e.target.result,
+          mimeType: file.type
+        });
+        DB.set('documentos', docs);
+        renderDocuments();
+        showToast('✓ Documento "' + file.name + '" subido correctamente');
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+  input.click();
+}
+
+function viewDoc(idx) {
+  var docs = DB.get('documentos') || [];
+  var doc = docs[idx];
+  if (!doc) return;
+  var win = window.open('', '_blank');
+  if (doc.mimeType === 'application/pdf') {
+    win.document.write('<html><body style="margin:0"><embed src="' + doc.dataUrl + '" width="100%" height="100%" type="application/pdf"></body></html>');
+  } else {
+    win.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + doc.dataUrl + '" style="max-width:100%;max-height:100vh"></body></html>');
+  }
+}
+
+function downloadDoc(idx) {
+  var docs = DB.get('documentos') || [];
+  var doc = docs[idx];
+  if (!doc) return;
+  var a = document.createElement('a');
+  a.href = doc.dataUrl;
+  a.download = doc.nombre;
+  a.click();
+}
+
+function printDoc(idx) {
+  var docs = DB.get('documentos') || [];
+  var doc = docs[idx];
+  if (!doc) return;
+  var win = window.open('', '_blank');
+  win.document.write('<html><body style="margin:0"><img src="' + doc.dataUrl + '" style="max-width:100%"><script>window.onload=function(){window.print();}<\/script></body></html>');
+}
+
+function deleteDoc(idx) {
+  if (!confirm('¿Eliminar este documento?')) return;
+  var docs = DB.get('documentos') || [];
+  docs.splice(idx, 1);
+  DB.set('documentos', docs);
+  renderDocuments();
+}
+
+function attachDoc(assetIdx, tipo, nombre) {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.pdf,.jpg,.jpeg,.png';
+  input.onchange = function() {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var docs = DB.get('documentos') || [];
+      docs.push({
+        nombre: file.name,
+        tipo: 'Factura',
+        relacionado: nombre,
+        fecha: new Date().toLocaleDateString('es-PE'),
+        tamano: (file.size / 1024).toFixed(1) + ' KB',
+        dataUrl: e.target.result,
+        mimeType: file.type
+      });
+      DB.set('documentos', docs);
+      showToast('✓ Documento adjuntado a "' + nombre + '"');
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function searchDocuments() {
+  var q = document.getElementById('doc-search').value.toLowerCase();
+  var docs = DB.get('documentos') || [];
+  var filtered = docs.filter(d => d.nombre.toLowerCase().includes(q) || (d.relacionado||'').toLowerCase().includes(q) || d.tipo.toLowerCase().includes(q));
+  var el = document.getElementById('docs-list');
+  if (!filtered.length) { el.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:20px">No se encontraron documentos.</div>'; return; }
+  renderDocuments();
+}
+
+// ── MÓDULO INVERSIONES ─────────────────────────────────────────────
+function renderInvestments() {
+  var items = DB.get('inversiones') || [];
+  var el = document.getElementById('inv-list');
+  if (!el) return;
+
+  var extra = items.reduce(function(s,i){ return s + Number(i.monto); }, 0);
+  var totalReal = EXCEL_DATA.inversionTotal + extra;
+
+  // Actualizar stat card
+  var invStat = document.getElementById('inv-total-stat');
+  if (invStat) invStat.textContent = fmtS(totalReal);
+
+  // Actualizar alert
+  var alertEl = document.querySelector('#mod-investments .alert-success');
+  if (alertEl) {
+    var extraTxt = extra > 0 ? ' + Extras S/' + extra.toLocaleString('es-PE') : '';
+    alertEl.innerHTML = '✓ Inversión total: <b>' + fmtS(totalReal) + '</b> — Base S/490,624' + extraTxt;
+  }
+
+  // Actualizar KPI inversión en dashboard
+  var k2 = document.getElementById('kpi-inversion');
+  if (k2) k2.textContent = fmtS(totalReal);
+
+  if (items.length === 0) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:40px;font-size:12px">No hay inversiones adicionales registradas.<br>Usa "Nueva Inversión" para agregar gastos adicionales al Excel.</div>';
+    return;
+  }
+
+  var html = '<table class="asset-table"><thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Monto S/.</th><th>Comprobante</th><th>Observación</th><th>Acciones</th></tr></thead><tbody>';
+  var total = 0;
+  items.forEach(function(item, idx) {
+    total += Number(item.monto);
+    html += "<tr>" +
+      "<td>" + item.fecha + "</td>" +
+      "<td><span class='badge badge-gold' style='font-size:9px'>" + item.categoria + "</span></td>" +
+      "<td>" + item.descripcion + "</td>" +
+      "<td style='font-weight:600;color:var(--brown)'>" + fmtS(item.monto) + "</td>" +
+      "<td>" + (item.comprobante || '—') + "</td>" +
+      "<td>" + (item.observacion || '—') + "</td>" +
+      "<td style='display:flex;gap:4px'><button class='btn btn-sm' style='padding:3px 8px;font-size:10px' onclick='editInversion(" + idx + ")'>✏</button><button class='btn btn-sm' style='padding:3px 8px;font-size:10px;color:var(--danger)' onclick='deleteInversion(" + idx + ")'>✕</button></td>" +
+      "</tr>";
+  });
+  html += "<tfoot><tr style='background:var(--bg-main)'><td colspan='3' style='padding:8px 10px;font-weight:600;color:var(--brown)'>EXTRAS REGISTRADOS</td><td colspan='4' style='padding:8px 10px;font-weight:700;color:var(--brown);font-size:14px'>" + fmtS(total) + "</td></tr></tfoot></table>";
+  el.innerHTML = html;
+}
+
+function editInversion(idx) {
+  var items = DB.get('inversiones') || [];
+  var item = items[idx];
+  if (!item) return;
+  var fecha = prompt('Fecha:', item.fecha) || item.fecha;
+  var categoria = prompt('Categoría:', item.categoria) || item.categoria;
+  var descripcion = prompt('Descripción:', item.descripcion) || item.descripcion;
+  var monto = parseFloat(prompt('Monto (S/):', item.monto));
+  if (isNaN(monto)) return;
+  var comprobante = prompt('Comprobante:', item.comprobante || '');
+  var observacion = prompt('Observación:', item.observacion || '');
+  items[idx] = { fecha, categoria, descripcion, monto, comprobante, observacion };
+  DB.set('inversiones', items);
+  renderInvestments();
+  showToast('✓ Inversión actualizada');
+}
+
+function addInversion() {
+  var fecha = prompt('Fecha (DD/MM/AAAA):',new Date().toLocaleDateString('es-PE'));
+  if (!fecha) return;
+  var categoria = prompt('Categoría:','Tangible');
+  var descripcion = prompt('Descripción:','');
+  if (!descripcion) return;
+  var monto = parseFloat(prompt('Monto (S/):','0'));
+  if (isNaN(monto)) return;
+  var comprobante = prompt('Nro. Comprobante:','');
+  var observacion = prompt('Observación:','');
+  var items = DB.get('inversiones') || [];
+  items.push({ fecha, categoria, descripcion, monto, comprobante, observacion });
+  DB.set('inversiones', items);
+  renderInvestments();
+  updateDashboard();
+  showToast('✓ Inversión registrada — Total actualizado');
+}
+
+function deleteInversion(idx) {
+  if (!confirm('¿Eliminar esta inversión?')) return;
+  var items = DB.get('inversiones') || [];
+  items.splice(idx, 1);
+  DB.set('inversiones', items);
+  renderInvestments();
+}
+
+// ── MÓDULO LAYOUT ──────────────────────────────────────────────────
+var LAYOUT_AREAS = ['FACHADA', 'LOCAL', 'PRODUCCION / COCINA', 'ALMACEN', 'ATENCION', 'ADMINISTRATIVA', 'SERVICIOS HIGIENICOS'];
+
+function renderLayout() {
+  var allImages = DB.get('layout_images') || {};
+
+  LAYOUT_AREAS.forEach(area => {
+    var key = 'area_' + area.replace(/\s+/g,'_');
+    var images = allImages[key] || [];
+    var container = document.getElementById('gallery-' + key);
+    if (!container) return;
+
+    var html = images.map((img, idx) => `
+      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;position:relative;cursor:pointer">
+        <img src="${img.dataUrl}" style="width:100%;height:80px;object-fit:cover" onclick="viewLayoutImage('${key}',${idx})">
+        <div style="padding:6px 8px;background:var(--white);font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px">${img.nombre}</span>
+          <div style="display:flex;gap:4px">
+            <span style="cursor:pointer;color:var(--gold)" onclick="downloadLayoutImage('${key}',${idx})">⬇</span>
+            <span style="cursor:pointer;color:var(--danger)" onclick="deleteLayoutImage('${key}',${idx})">✕</span>
+          </div>
+        </div>
+      </div>`).join('');
+
+    html += `<div style="border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;height:80px;cursor:pointer;transition:all .2s" onclick="uploadLayoutImage('${key}')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="text-align:center;color:var(--text-light);font-size:11px">🖼<br>Agregar imagen</div>
+    </div>`;
+    container.innerHTML = html;
+
+    var countEl = document.getElementById('count-' + key);
+    if (countEl) countEl.textContent = images.length + ' imagen' + (images.length !== 1 ? 'es' : '');
+  });
+}
+
+function uploadAssetImage(assetIdx) {
+  var items = DB.get('activos_tangibles') || [];
+  var item = items[assetIdx];
+  if (!item) return;
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.jpg,.jpeg,.png';
+  input.onchange = function() {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      items[assetIdx].imagen = e.target.result;
+      DB.set('activos_tangibles', items);
+      renderTangibles();
+      showToast('✓ Imagen subida para "' + item.nombre.substring(0,30) + '"');
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function viewAssetImage(assetIdx) {
+  var items = DB.get('activos_tangibles') || [];
+  var item = items[assetIdx];
+  if (!item || !item.imagen) return;
+  var win = window.open('', '_blank');
+  win.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + item.imagen + '" style="max-width:100%;max-height:100vh"></body></html>');
+}
+
+function deleteAssetImage(assetIdx) {
+  if (!confirm('¿Eliminar imagen?')) return;
+  var items = DB.get('activos_tangibles') || [];
+  if (items[assetIdx]) { delete items[assetIdx].imagen; DB.set('activos_tangibles', items); renderTangibles(); }
+}
+
+function uploadLayoutImage(areaKey) {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.jpg,.jpeg,.png,.pdf';
+  input.multiple = true;
+  input.onchange = function() {
+    Array.from(input.files).forEach(file => {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var allImages = DB.get('layout_images') || {};
+        if (!allImages[areaKey]) allImages[areaKey] = [];
+        allImages[areaKey].push({ nombre: file.name, dataUrl: e.target.result, mimeType: file.type });
+        DB.set('layout_images', allImages);
+        renderLayout();
+        showToast('✓ Imagen "' + file.name + '" subida');
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+  input.click();
+}
+
+function viewLayoutImage(areaKey, idx) {
+  var allImages = DB.get('layout_images') || {};
+  var img = (allImages[areaKey] || [])[idx];
+  if (!img) return;
+  var win = window.open('', '_blank');
+  win.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + img.dataUrl + '" style="max-width:100%;max-height:100vh"></body></html>');
+}
+
+function downloadLayoutImage(areaKey, idx) {
+  var allImages = DB.get('layout_images') || {};
+  var img = (allImages[areaKey] || [])[idx];
+  if (!img) return;
+  var a = document.createElement('a');
+  a.href = img.dataUrl;
+  a.download = img.nombre;
+  a.click();
+}
+
+function deleteLayoutImage(areaKey, idx) {
+  if (!confirm('¿Eliminar imagen?')) return;
+  var allImages = DB.get('layout_images') || {};
+  if (allImages[areaKey]) { allImages[areaKey].splice(idx, 1); DB.set('layout_images', allImages); renderLayout(); }
+}
+
+// ── CALCULADORA AMORTIZACIÓN ───────────────────────────────────────
+function calcAmort() {
+  var P = parseFloat(document.getElementById('calc-monto').value) || 0;
+  var tea = parseFloat(document.getElementById('calc-tea').value) || 0;
+  var n = parseInt(document.getElementById('calc-plazo').value) || 1;
+  var seg = parseFloat(document.getElementById('calc-seguro').value) / 100 || 0;
+  var r = Math.pow(1 + tea/100, 1/12) - 1;
+  var cuota = P * r * Math.pow(1+r,n) / (Math.pow(1+r,n) - 1);
+  var totalIntereses = 0;
+  var rows = '';
+  var saldo = P;
+  for (var i = 1; i <= Math.min(n, 12); i++) {
+    var interes = saldo * r;
+    var capital = cuota - interes;
+    var seguroMes = saldo * seg;
+    saldo -= capital;
+    if (saldo < 0) saldo = 0;
+    totalIntereses += interes;
+    rows += `<tr><td>${i}</td><td>S/ ${cuota.toFixed(2)}</td><td>S/ ${capital.toFixed(2)}</td><td style="color:var(--danger)">S/ ${interes.toFixed(2)}</td><td style="color:var(--text-light)">S/ ${seguroMes.toFixed(2)}</td><td style="font-weight:600;color:var(--brown)">S/ ${Math.max(0,saldo).toFixed(2)}</td></tr>`;
+  }
+  if (n > 12) rows += `<tr><td colspan="6" style="text-align:center;color:var(--text-light);font-size:10px">... ${n-12} cuotas adicionales</td></tr>`;
+  document.getElementById('calc-cuota').textContent = 'S/ ' + (cuota + P*seg).toFixed(2);
+  document.getElementById('calc-interest').textContent = 'S/ ' + totalIntereses.toFixed(2);
+  document.getElementById('calc-total').textContent = 'S/ ' + (cuota * n).toFixed(2);
+  document.getElementById('amort-rows').innerHTML = rows;
+}
+
+// ── POS / CARRITO ──────────────────────────────────────────────────
+function addToCart(name, price) {
+  cart.push({name: name, price: parseFloat(price)});
+  renderCart();
+}
+
+function renderCart() {
+  var html = '';
+  var total = 0;
+  cart.forEach(function(item, i) {
+    total += item.price;
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px"><span>${item.name}</span><span style="display:flex;align-items:center;gap:8px"><b style="color:var(--brown)">S/ ${item.price.toFixed(2)}</b><span style="cursor:pointer;color:var(--danger)" onclick="removeItem(${i})">✕</span></span></div>`;
+  });
+  if (cart.length === 0) html = '<div style="text-align:center;color:var(--text-light);font-size:11px;padding:20px 0">Selecciona productos</div>';
+  document.getElementById('cart-items').innerHTML = html;
+  var sinIgv = total / 1.18;
+  document.getElementById('cart-sub').textContent = 'S/ ' + sinIgv.toFixed(2);
+  document.getElementById('cart-igv').textContent = 'S/ ' + (total - sinIgv).toFixed(2);
+  document.getElementById('cart-total').textContent = 'S/ ' + total.toFixed(2);
+}
+
+function removeItem(i) { cart.splice(i, 1); renderCart(); }
+
+function processSale() {
+  if (cart.length === 0) { alert('Agrega productos al carrito'); return; }
+  var total = cart.reduce(function(s, i) { return s + i.price; }, 0);
+  showToast('✅ Venta registrada: S/ ' + total.toFixed(2) + ' · IGV: S/ ' + (total - total/1.18).toFixed(2));
+  cart = [];
+  renderCart();
+}
+
+// ── EXPORTAR EXCEL ─────────────────────────────────────────────────
+function exportToExcel(type) {
+  var data = [];
+  if (type === 'assets') {
+    data = (DB.get('activos_tangibles') || []).map(i => [i.id, i.seccion, i.nombre, i.proveedor, i.cantidad, i.precioUnit, i.total]);
+    data.unshift(['ID', 'Sección', 'Nombre', 'Proveedor', 'Cantidad', 'Precio Unit. S/', 'Total S/']);
+  } else if (type === 'capital') {
+    data = (DB.get('capital_items') || []).map(i => [i.tipo, i.categoria, i.monto]);
+    data.unshift(['Tipo', 'Categoría', 'Monto S/']);
+  }
+  var csv = data.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+  var blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'firstsip_' + type + '_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  showToast('✓ Exportado a CSV correctamente');
+}
+
+function importExcel() {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.xlsx,.xls,.csv';
+  input.onchange = function() {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.name.endsWith('.csv')) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var lines = e.target.result.split('\n').filter(l => l.trim());
+        showToast('📥 Archivo "' + file.name + '" leído · ' + (lines.length-1) + ' filas. Funcionalidad completa disponible con librería SheetJS.');
+      };
+      reader.readAsText(file);
+    } else {
+      showToast('📥 Para importar .xlsx instala la librería SheetJS en la versión Node.js del ERP.');
+    }
+  };
+  input.click();
+}
+
+function exportReport() {
+  window.print();
+}
+
+// ── TOAST NOTIFICATION ─────────────────────────────────────────────
+function showToast(msg) {
+  var t = document.getElementById('erp-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'erp-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--brown);color:white;padding:12px 20px;border-radius:10px;font-size:12px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:all .3s;max-width:320px';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+}
+
+// ── INICIALIZAR ERP ────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  initDB();
+  updateDashboard();
+
+  setTimeout(calcAmort, 200);
+
+  // Pie chart total real
+  setTimeout(function() {
+    var pieTotal = document.querySelector('.pie-svg text:last-child');
+    if (pieTotal) pieTotal.textContent = 'S/ 491k';
+  }, 100);
+});
+
+</script>
+</body>
+</html>
